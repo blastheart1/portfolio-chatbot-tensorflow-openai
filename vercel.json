@@ -4,12 +4,17 @@
   "outputDirectory": "build",
   "installCommand": "npm install",
   "framework": "create-react-app",
+  "public": true,
   "routes": [
     {
       "src": "/static/(.*)",
       "headers": {
         "cache-control": "s-maxage=31536000,immutable"
       }
+    },
+    {
+      "src": "/embed(.*)",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
