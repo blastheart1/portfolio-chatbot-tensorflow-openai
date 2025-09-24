@@ -119,7 +119,7 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
     ? 'fixed bottom-6 left-6' 
     : 'fixed bottom-6 right-6';
 
-  const iconSrc = customIcon || (process.env.PUBLIC_URL + '/LuisBot.ico');
+  const iconSrc = customIcon || '/LuisBot.ico';
 
   return (
     <div className="luis-chatbot-widget" style={{ zIndex: 9999 }}>

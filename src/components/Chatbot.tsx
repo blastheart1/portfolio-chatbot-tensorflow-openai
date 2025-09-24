@@ -128,7 +128,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     <>
       {/* Floating Chat Button */}
       <motion.img
-        src={process.env.PUBLIC_URL + "/LuisBot.ico"}
+        src="/LuisBot.ico"
         alt="LuisBot"
         onClick={toggleChat}
         className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40"
