@@ -127,9 +127,11 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   return (
     <>
       {/* Floating Chat Button */}
-      <motion.div
+      <motion.img
+        src="/LuisBot.png"
+        alt="Luis AI Chatbot"
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300"
+        className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40 object-cover"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         initial={{ scale: 0, opacity: 0 }}
@@ -148,30 +150,24 @@ export const Chatbot: React.FC<ChatbotProps> = ({
             toggleChat();
           }
         }}
-      >
-        <img
-          src="/LuisBot.png"
-          alt="Luis AI Chatbot"
-          className="w-full h-full rounded-full object-cover"
-          onError={(e) => {
-            const target = e.currentTarget;
-            if (target.src.endsWith('/LuisBot.png')) {
-              console.warn('PNG failed, trying ICO');
-              target.src = '/LuisBot.ico';
-            } else if (target.src.endsWith('/LuisBot.ico')) {
-              console.warn('ICO failed, using default favicon');
-              target.src = '/favicon.ico';
-            } else {
-              console.warn('All images failed, using emoji fallback');
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = '🤖';
-            }
-          }}
-          loading="eager"
-          width="80"
-          height="80"
-        />
-      </motion.div>
+        onError={(e) => {
+          const target = e.currentTarget;
+          if (target.src.endsWith('/LuisBot.png')) {
+            console.warn('PNG failed, trying ICO');
+            target.src = '/LuisBot.ico';
+          } else if (target.src.endsWith('/LuisBot.ico')) {
+            console.warn('ICO failed, using default favicon');
+            target.src = '/favicon.ico';
+          } else {
+            console.warn('All images failed, using emoji fallback');
+            target.style.display = 'none';
+            target.parentElement!.innerHTML = '🤖';
+          }
+        }}
+        loading="eager"
+        width="80"
+        height="80"
+      />
 
 
       {/* Loading indicator */}
