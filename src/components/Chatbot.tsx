@@ -154,8 +154,18 @@ export const Chatbot: React.FC<ChatbotProps> = ({
           alt="Luis AI Chatbot"
           className="w-full h-full rounded-full object-cover"
           onError={(e) => {
-            console.warn('Chatbot icon failed to load, using fallback');
-            e.currentTarget.src = '/favicon.ico';
+            const target = e.currentTarget;
+            if (target.src.endsWith('/LuisBot.png')) {
+              console.warn('PNG failed, trying ICO');
+              target.src = '/LuisBot.ico';
+            } else if (target.src.endsWith('/LuisBot.ico')) {
+              console.warn('ICO failed, using default favicon');
+              target.src = '/favicon.ico';
+            } else {
+              console.warn('All images failed, using emoji fallback');
+              target.style.display = 'none';
+              target.parentElement!.innerHTML = '🤖';
+            }
           }}
           loading="eager"
           width="80"
