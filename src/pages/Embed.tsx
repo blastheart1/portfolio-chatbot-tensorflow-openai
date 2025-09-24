@@ -11,17 +11,24 @@ const Embed: React.FC = () => {
 
   return (
     <div style={{ 
+      position: 'fixed',
+      top: 0,
+      left: 0,
       width: '100vw', 
       height: '100vh', 
       background: 'transparent',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      pointerEvents: 'none', // Allow clicks to pass through
+      zIndex: 9999
     }}>
-      <EmbeddableChatbot
-        openaiApiKey={apiKey}
-        confidenceThreshold={threshold}
-        position={position}
-        theme={theme}
-      />
+      <div style={{ pointerEvents: 'auto' }}>
+        <EmbeddableChatbot
+          openaiApiKey={apiKey}
+          confidenceThreshold={threshold}
+          position={position}
+          theme={theme}
+        />
+      </div>
     </div>
   );
 };

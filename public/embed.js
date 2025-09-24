@@ -10,59 +10,125 @@
     iconUrl: 'https://luis-chatbot.vercel.app/LuisBot.ico'
   };
 
-  // Load the chatbot widget
+  // Load the chatbot widget as a direct floating button
   function loadChatbotWidget(config = {}) {
     const finalConfig = { ...defaultConfig, ...config };
     
-    // Create container div
-    const container = document.createElement('div');
-    container.id = 'luis-chatbot-container';
-    container.style.cssText = `
+    // Create the floating button directly (no container)
+    const button = document.createElement('img');
+    button.id = 'luis-chatbot-floating-button';
+    button.src = finalConfig.iconUrl;
+    button.alt = 'Luis AI Chatbot';
+    button.style.cssText = `
       position: fixed;
       ${finalConfig.position === 'bottom-left' ? 'left: 24px;' : 'right: 24px;'}
       bottom: 24px;
-      z-index: 9999;
       width: 64px;
       height: 64px;
-    `;
-
-    // Create iframe for the chatbot
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://luis-chatbot.vercel.app/embed?apiKey=${encodeURIComponent(finalConfig.apiKey)}&threshold=${finalConfig.confidenceThreshold}&position=${finalConfig.position}&theme=${finalConfig.theme}`;
-    iframe.style.cssText = `
-      width: 100%;
-      height: 100%;
-      border: none;
+      cursor: pointer;
+      z-index: 9999;
+      object-fit: cover;
       transition: transform 0.2s ease;
+      border: none;
+      background: transparent;
     `;
-    iframe.title = 'Luis AI Chatbot';
 
     // Add hover effects
-    iframe.addEventListener('mouseenter', function() {
+    button.addEventListener('mouseenter', function() {
       this.style.transform = 'scale(1.05)';
     });
 
-    iframe.addEventListener('mouseleave', function() {
+    button.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1)';
     });
 
-    container.appendChild(iframe);
-    document.body.appendChild(container);
+    // Add click handler to open chat in iframe
+    button.addEventListener('click', function() {
+      openChatWindow(finalConfig);
+    });
 
-    // Add CSS for subtle animations
-    const style = document.createElement('style');
-    style.textContent = `
-      #luis-chatbot-container {
-        transition: transform 0.2s ease;
+    // Add keyboard accessibility
+    button.setAttribute('role', 'button');
+    button.setAttribute('tabindex', '0');
+    button.setAttribute('aria-label', 'Open AI Chatbot');
+
+    button.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openChatWindow(finalConfig);
       }
-      
-      #luis-chatbot-container:hover {
-        transform: scale(1.05);
-      }
+    });
+
+    // Add to page directly
+    document.body.appendChild(button);
+
+    // Add entrance animation
+    button.style.opacity = '0';
+    button.style.transform = 'scale(0)';
+    setTimeout(() => {
+      button.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      button.style.opacity = '1';
+      button.style.transform = 'scale(1)';
+    }, 100);
+
+    console.log('🤖 Luis Chatbot floating button loaded successfully!');
+  }
+
+  // Open chat window in iframe overlay
+  function openChatWindow(config) {
+    // Remove existing chat if open
+    const existingChat = document.getElementById('luis-chatbot-window');
+    if (existingChat) {
+      document.body.removeChild(existingChat);
+      return;
+    }
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'luis-chatbot-window';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     `;
-    document.head.appendChild(style);
 
-    console.log('🤖 Luis Chatbot widget loaded successfully!');
+    // Create chat iframe
+    const chatIframe = document.createElement('iframe');
+    chatIframe.src = `https://luis-chatbot.vercel.app/embed?apiKey=${encodeURIComponent(config.apiKey)}&threshold=${config.confidenceThreshold}&position=${config.position}&theme=${config.theme}`;
+    chatIframe.style.cssText = `
+      width: 400px;
+      height: 600px;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      background: white;
+    `;
+
+    overlay.appendChild(chatIframe);
+    document.body.appendChild(overlay);
+
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        document.body.removeChild(overlay);
+      }
+    });
+
+    // Close on escape key
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        document.body.removeChild(overlay);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
   }
 
   // Auto-load if script has data attributes
