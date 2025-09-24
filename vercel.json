@@ -5,20 +5,21 @@
   "installCommand": "npm install",
   "framework": "create-react-app",
   "public": true,
-  "routes": [
+  "headers": [
     {
-      "src": "/static/(.*)",
-      "headers": {
-        "cache-control": "s-maxage=31536000,immutable"
-      }
-    },
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=31536000,immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
     {
-      "src": "/embed(.*)",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!LuisBot\\.png|LuisBot\\.ico|code-light\\.ico|code-dark\\.ico|manifest\\.json|.*\\.(?:png|jpg|jpeg|gif|svg|ico|json|webp)).*)",
+      "destination": "/index.html"
     }
   ]
 }
