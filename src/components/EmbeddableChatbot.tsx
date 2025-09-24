@@ -28,7 +28,8 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
   customIcon,
   onStatusChange
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  // Auto-open chat if we're in an iframe (embed context)
+  const [isOpen, setIsOpen] = useState(window.parent !== window);
   const [isModelReady, setIsModelReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -121,53 +122,58 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
 
   const iconSrc = customIcon || '/LuisBot.png';
 
+  // Check if we're in an iframe (embed context)
+  const isInIframe = window.parent !== window;
+
   return (
     <div className="luis-chatbot-widget" style={{ zIndex: 9999 }}>
-      {/* Floating Chat Button */}
-      <motion.img
-        src={iconSrc}
-        alt="Luis AI Chatbot"
-        onClick={toggleChat}
-        className={`${positionClasses} w-16 h-16 cursor-pointer z-40 object-cover`}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.98 }}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ 
-          type: "spring", 
-          stiffness: 200, 
-          damping: 15 
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="Open AI Chatbot"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleChat();
-          }
-        }}
-        onError={(e) => {
-          const target = e.currentTarget;
-          if (target.src.endsWith('/LuisBot.png')) {
-            console.warn('PNG failed, trying ICO');
-            target.src = '/LuisBot.ico';
-          } else if (target.src.endsWith('/LuisBot.ico')) {
-            console.warn('ICO failed, using default favicon');
-            target.src = '/favicon.ico';
-          } else {
-            console.warn('All images failed, using emoji fallback');
-            target.style.display = 'none';
-            target.parentElement!.innerHTML = '🤖';
-          }
-        }}
-        loading="eager"
-        width="64"
-        height="64"
-      />
+      {/* Floating Chat Button - Only show if not in iframe */}
+      {!isInIframe && (
+        <motion.img
+          src={iconSrc}
+          alt="Luis AI Chatbot"
+          onClick={toggleChat}
+          className={`${positionClasses} w-16 h-16 cursor-pointer z-40 object-cover`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ 
+            type: "spring", 
+            stiffness: 200, 
+            damping: 15 
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Open AI Chatbot"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggleChat();
+            }
+          }}
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (target.src.endsWith('/LuisBot.png')) {
+              console.warn('PNG failed, trying ICO');
+              target.src = '/LuisBot.ico';
+            } else if (target.src.endsWith('/LuisBot.ico')) {
+              console.warn('ICO failed, using default favicon');
+              target.src = '/favicon.ico';
+            } else {
+              console.warn('All images failed, using emoji fallback');
+              target.style.display = 'none';
+              target.parentElement!.innerHTML = '🤖';
+            }
+          }}
+          loading="eager"
+          width="64"
+          height="64"
+        />
+      )}
 
-      {/* Loading indicator */}
-      {isLoading && (
+      {/* Loading indicator - Only show if not in iframe */}
+      {!isInIframe && isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -180,8 +186,8 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
         </motion.div>
       )}
 
-      {/* Error indicator */}
-      {error && (
+      {/* Error indicator - Only show if not in iframe */}
+      {!isInIframe && error && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

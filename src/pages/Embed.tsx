@@ -1,7 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { EmbeddableChatbot } from '../components/EmbeddableChatbot';
 
 const Embed: React.FC = () => {
+  // Ensure proper viewport for mobile
+  useEffect(() => {
+    // Set viewport meta tag for mobile optimization
+    let viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      viewport = document.createElement('meta');
+      viewport.setAttribute('name', 'viewport');
+      document.head.appendChild(viewport);
+    }
+    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    
+    // Prevent body scroll when chat is open
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // Get URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const apiKey = urlParams.get('apiKey') || '';

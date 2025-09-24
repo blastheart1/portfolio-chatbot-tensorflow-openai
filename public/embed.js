@@ -83,6 +83,9 @@
       return;
     }
 
+    // Detect mobile
+    const isMobile = window.innerWidth <= 768;
+    
     // Create overlay
     const overlay = document.createElement('div');
     overlay.id = 'luis-chatbot-window';
@@ -92,22 +95,23 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
+      background: ${isMobile ? 'transparent' : 'rgba(0, 0, 0, 0.5)'};
       z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
     `;
-
+    
     // Create chat iframe
     const chatIframe = document.createElement('iframe');
     chatIframe.src = `https://luis-chatbot.vercel.app/embed?apiKey=${encodeURIComponent(config.apiKey)}&threshold=${config.confidenceThreshold}&position=${config.position}&theme=${config.theme}`;
     chatIframe.style.cssText = `
-      width: 400px;
-      height: 600px;
+      ${isMobile 
+        ? 'width: 100vw; height: 100vh; border-radius: 0;' 
+        : 'width: 400px; height: 600px; border-radius: 12px;'
+      }
       border: none;
-      border-radius: 12px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: ${isMobile ? 'none' : '0 20px 40px rgba(0, 0, 0, 0.3)'};
       background: white;
     `;
 

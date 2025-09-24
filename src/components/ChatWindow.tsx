@@ -327,24 +327,45 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     setPendingLearning(null);
   };
 
+  // Detect if we're on mobile
+  const isMobile = window.innerWidth <= 768;
+  
+  // Check if we're in an iframe (embed context)
+  const isInIframe = window.parent !== window;
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          initial={{ opacity: 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: 20 }}
+          exit={{ opacity: 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : 20 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50"
+          className={`
+            ${isMobile || isInIframe 
+              ? 'fixed inset-0 w-full h-full bg-white flex flex-col z-50' 
+              : 'fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50'
+            }
+          `}
+          style={{
+            // Apple device safe area support
+            paddingTop: isMobile ? 'env(safe-area-inset-top, 0px)' : '0px',
+            paddingBottom: isMobile ? 'env(safe-area-inset-bottom, 0px)' : '0px',
+            paddingLeft: isMobile ? 'env(safe-area-inset-left, 0px)' : '0px',
+            paddingRight: isMobile ? 'env(safe-area-inset-right, 0px)' : '0px',
+          }}
         >
           {/* Header */}
           <div 
-            className="flex items-center justify-between p-4 border-b border-gray-200 text-white rounded-t-2xl"
+            className={`flex items-center justify-between border-b border-gray-200 text-white ${
+              isMobile ? 'p-4' : 'p-4 rounded-t-2xl'
+            }`}
             style={{
               background: isDarkMode 
                 ? 'linear-gradient(to right, #ffffff, #0033a0)' 
                 : 'linear-gradient(to right, #000000, #0033a0)',
-              color: isDarkMode ? '#000000' : '#ffffff'
+              color: isDarkMode ? '#000000' : '#ffffff',
+              minHeight: isMobile ? '60px' : 'auto'
             }}
           >
             <div className="flex items-center space-x-2">
@@ -367,7 +388,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 bg-chat-bg">
+          <div className={`flex-1 overflow-y-auto bg-chat-bg ${isMobile ? 'p-3' : 'p-4'}`}>
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
@@ -422,7 +443,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           )}
 
           {/* Input */}
-          <div className="p-4 border-t border-gray-200">
+          <div 
+            className={`border-t border-gray-200 ${isMobile ? 'p-3' : 'p-4'}`}
+            style={{
+              // Extra padding for iOS keyboard
+              paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom, 0px) + 12px)' : undefined
+            }}
+          >
             <div className="flex space-x-2">
               <input
                 ref={inputRef}
@@ -431,15 +458,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything about Luis..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={`flex-1 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isMobile ? 'px-4 py-3 text-base' : 'px-4 py-2'
+                }`}
                 disabled={isTyping}
+                style={{
+                  // Prevent zoom on iOS
+                  fontSize: isMobile ? '16px' : undefined
+                }}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputValue.trim() || isTyping}
-                className="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-w-[48px] min-h-[48px]"
+                className={`bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center ${
+                  isMobile ? 'p-3 min-w-[52px] min-h-[52px]' : 'p-3 min-w-[48px] min-h-[48px]'
+                }`}
               >
-                <Send className="w-5 h-5" />
+                <Send className={`${isMobile ? 'w-6 h-6' : 'w-5 h-5'}`} />
               </button>
             </div>
           </div>
