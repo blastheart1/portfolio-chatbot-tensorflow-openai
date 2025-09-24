@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { Chatbot } from './components/Chatbot';
+import Embed from './pages/Embed';
 import './App.css';
 
 interface ChatbotStatus {
@@ -29,6 +30,12 @@ function App() {
     learningCount: 0,
     isConfigured: false
   });
+
+  // Check if this is the embed route
+  if (window.location.pathname === '/embed') {
+    return <Embed />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Demo content */}
