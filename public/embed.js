@@ -33,47 +33,31 @@
       width: 100%;
       height: 100%;
       border: none;
-      border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease;
     `;
     iframe.title = 'Luis AI Chatbot';
 
     // Add hover effects
     iframe.addEventListener('mouseenter', function() {
       this.style.transform = 'scale(1.05)';
-      this.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.25)';
     });
 
     iframe.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1)';
-      this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
     });
 
     container.appendChild(iframe);
     document.body.appendChild(container);
 
-    // Add CSS for animations
+    // Add CSS for subtle animations
     const style = document.createElement('style');
     style.textContent = `
       #luis-chatbot-container {
-        animation: luis-chatbot-bounce 2s infinite;
-      }
-      
-      @keyframes luis-chatbot-bounce {
-        0%, 20%, 50%, 80%, 100% {
-          transform: translateY(0);
-        }
-        40% {
-          transform: translateY(-10px);
-        }
-        60% {
-          transform: translateY(-5px);
-        }
+        transition: transform 0.2s ease;
       }
       
       #luis-chatbot-container:hover {
-        animation: none;
+        transform: scale(1.05);
       }
     `;
     document.head.appendChild(style);

@@ -124,9 +124,11 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
   return (
     <div className="luis-chatbot-widget" style={{ zIndex: 9999 }}>
       {/* Floating Chat Button */}
-      <motion.div
+      <motion.img
+        src={iconSrc}
+        alt="Luis AI Chatbot"
         onClick={toggleChat}
-        className={`${positionClasses} w-16 h-16 cursor-pointer z-40 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300`}
+        className={`${positionClasses} w-16 h-16 cursor-pointer z-40 object-cover`}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         initial={{ scale: 0, opacity: 0 }}
@@ -145,30 +147,24 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
             toggleChat();
           }
         }}
-      >
-        <img
-          src={iconSrc}
-          alt="Luis AI Chatbot"
-          className="w-full h-full rounded-full object-cover"
-          onError={(e) => {
-            const target = e.currentTarget;
-            if (target.src.endsWith('/LuisBot.png')) {
-              console.warn('PNG failed, trying ICO');
-              target.src = '/LuisBot.ico';
-            } else if (target.src.endsWith('/LuisBot.ico')) {
-              console.warn('ICO failed, using default favicon');
-              target.src = '/favicon.ico';
-            } else {
-              console.warn('All images failed, using emoji fallback');
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = '🤖';
-            }
-          }}
-          loading="eager"
-          width="64"
-          height="64"
-        />
-      </motion.div>
+        onError={(e) => {
+          const target = e.currentTarget;
+          if (target.src.endsWith('/LuisBot.png')) {
+            console.warn('PNG failed, trying ICO');
+            target.src = '/LuisBot.ico';
+          } else if (target.src.endsWith('/LuisBot.ico')) {
+            console.warn('ICO failed, using default favicon');
+            target.src = '/favicon.ico';
+          } else {
+            console.warn('All images failed, using emoji fallback');
+            target.style.display = 'none';
+            target.parentElement!.innerHTML = '🤖';
+          }
+        }}
+        loading="eager"
+        width="64"
+        height="64"
+      />
 
       {/* Loading indicator */}
       {isLoading && (
