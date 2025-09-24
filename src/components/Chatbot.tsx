@@ -150,7 +150,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
         }}
       >
         <img
-          src="/LuisBot.ico"
+          src="/LuisBot.png"
           alt="Luis AI Chatbot"
           className="w-full h-full rounded-full object-cover"
           onError={(e) => {
