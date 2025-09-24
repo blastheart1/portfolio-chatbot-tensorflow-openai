@@ -127,11 +127,9 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   return (
     <>
       {/* Floating Chat Button */}
-      <motion.img
-        src="/LuisBot.ico"
-        alt="LuisBot"
+      <motion.div
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40"
+        className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40 rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.98 }}
         initial={{ scale: 0, opacity: 0 }}
@@ -141,7 +139,29 @@ export const Chatbot: React.FC<ChatbotProps> = ({
           stiffness: 200, 
           damping: 15 
         }}
-      />
+        role="button"
+        tabIndex={0}
+        aria-label="Open AI Chatbot"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleChat();
+          }
+        }}
+      >
+        <img
+          src="/LuisBot.ico"
+          alt="Luis AI Chatbot"
+          className="w-full h-full rounded-full object-cover"
+          onError={(e) => {
+            console.warn('Chatbot icon failed to load, using fallback');
+            e.currentTarget.src = '/favicon.ico';
+          }}
+          loading="eager"
+          width="80"
+          height="80"
+        />
+      </motion.div>
 
 
       {/* Loading indicator */}
