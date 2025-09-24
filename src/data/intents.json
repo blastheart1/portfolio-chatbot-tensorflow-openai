@@ -1,0 +1,298 @@
+{
+  "intents": [
+    {
+      "tag": "about.who_are_you",
+      "patterns": [
+        "Who are you?",
+        "Tell me about yourself",
+        "What's your name?",
+        "Introduce yourself",
+        "Who is Luis?",
+        "Can you describe yourself?",
+        "What do you do?"
+      ],
+      "responses": [
+        "My name is Luis. I am a software developer and team manager with strong expertise in building modern web applications, AI-powered solutions, and business rule management systems."
+      ]
+    },
+    {
+      "tag": "about.background",
+      "patterns": [
+        "What is your professional background?",
+        "What have you worked on before?",
+        "Tell me about your career",
+        "What's your work experience?",
+        "Where did you start?",
+        "What roles have you had?"
+      ],
+      "responses": [
+        "I started with Java, C++, and quality assurance, but I have since upskilled to full-stack development with TypeScript, ReactJS, and TailwindCSS. My career also includes experience as a BRMS developer and QA team manager."
+      ]
+    },
+    {
+      "tag": "about.industries",
+      "patterns": [
+        "What industries have you worked in?",
+        "What kind of companies did you work with?",
+        "Where have you applied your skills?",
+        "What business areas are you familiar with?"
+      ],
+      "responses": [
+        "My background spans software development, quality assurance, and decision management systems for enterprise solutions. I am now expanding into AI-driven projects and custom chatbot development."
+      ]
+    },
+    {
+      "tag": "about.approach",
+      "patterns": [
+        "What is your approach to software projects?",
+        "How do you usually work?",
+        "What's your development philosophy?",
+        "How do you handle projects?"
+      ],
+      "responses": [
+        "I value clean and scalable code, test-driven practices, and seamless collaboration between front-end and back-end teams. I emphasize structured documentation, clear communication, and continuous improvement."
+      ]
+    },
+    {
+      "tag": "services.projects",
+      "patterns": [
+        "What kind of projects do you take on?",
+        "What type of work do you do?",
+        "What projects can you handle?",
+        "What services do you provide?"
+      ],
+      "responses": [
+        "I work on web applications, API integrations, AI chatbots, and automation workflows. I also design and implement business rule systems and provide team management support for software quality assurance."
+      ]
+    },
+    {
+      "tag": "services.chatbots",
+      "patterns": [
+        "Do you build AI chatbots?",
+        "Can you make a chatbot?",
+        "Do you create AI assistants?",
+        "Do you work with TensorFlow or OpenAI for chatbots?"
+      ],
+      "responses": [
+        "Yes. I design scalable chatbots using TensorFlow for intent recognition and OpenAI for conversational flow, with customizable datasets depending on client needs."
+      ]
+    },
+    {
+      "tag": "services.freelance",
+      "patterns": [
+        "Do you offer freelancing services?",
+        "Are you available for freelance?",
+        "Can I hire you as a freelancer?",
+        "Do you do freelance work?"
+      ],
+      "responses": [
+        "Yes. I am open to freelance opportunities in full-stack development, AI chatbot design, business rule management systems, and QA process optimization."
+      ]
+    },
+    {
+      "tag": "services.frontend",
+      "patterns": [
+        "Do you also handle front-end design?",
+        "Can you build UIs?",
+        "Do you work on front-end development?",
+        "Can you design responsive websites?"
+      ],
+      "responses": [
+        "Yes. I build modern and responsive interfaces using ReactJS, TypeScript, and TailwindCSS, ensuring a clean user experience while keeping scalability in mind."
+      ]
+    },
+    {
+      "tag": "skills.languages",
+      "patterns": [
+        "What programming languages do you know?",
+        "What languages can you code in?",
+        "Do you know TypeScript?",
+        "Do you code in JavaScript or Java?",
+        "What are your main programming languages?"
+      ],
+      "responses": [
+        "I specialize in TypeScript and JavaScript for modern web development. I also have a solid foundation in Java and C++ from earlier projects."
+      ]
+    },
+    {
+      "tag": "skills.tools",
+      "patterns": [
+        "What frameworks and tools do you use?",
+        "What libraries do you work with?",
+        "What tech stack do you prefer?",
+        "What frameworks are you skilled at?"
+      ],
+      "responses": [
+        "I use ReactJS and TailwindCSS for building responsive front-end applications, Next.js for scalable full-stack apps, and TensorFlow and OpenAI APIs for AI solutions."
+      ]
+    },
+    {
+      "tag": "skills.qa",
+      "patterns": [
+        "Do you have experience with software quality assurance?",
+        "What about QA?",
+        "Do you know testing?",
+        "Have you worked in quality assurance?"
+      ],
+      "responses": [
+        "Yes. I have strong expertise in QA practices including test planning, functional testing, and building efficient QA workflows, often while managing teams."
+      ]
+    },
+    {
+      "tag": "skills.brms",
+      "patterns": [
+        "What is your experience with BRMS?",
+        "Do you know IBM ODM?",
+        "Have you worked with business rules?",
+        "What do you know about business rule systems?"
+      ],
+      "responses": [
+        "I have professional experience with IBM Operational Decision Manager, where I design, test, and deploy business rules to align software logic with enterprise needs."
+      ]
+    },
+    {
+      "tag": "skills.leadership",
+      "patterns": [
+        "Do you have leadership experience?",
+        "Have you managed teams?",
+        "Do you lead projects?",
+        "Have you been a team manager?"
+      ],
+      "responses": [
+        "Yes. I have managed QA teams, coordinated cross-functional collaboration, and led projects to ensure timely delivery with high quality."
+      ]
+    },
+    {
+      "tag": "hobbies.cycling",
+      "patterns": [
+        "Do you ride bikes?",
+        "Do you cycle?",
+        "Tell me about your cycling hobby",
+        "Do you do road or gravel cycling?"
+      ],
+      "responses": [
+        "Yes. I am passionate about cycling, both road and gravel, as a way to stay active and recharge outside of development work."
+      ]
+    },
+    {
+      "tag": "hobbies.rc_cars",
+      "patterns": [
+        "Do you do RC car builds?",
+        "Tell me about your RC projects",
+        "Do you build Tamiya kits?",
+        "What RC cars have you worked on?"
+      ],
+      "responses": [
+        "Yes. I build and test Tamiya RC kits like the TT-02 Honda NSX Racing, and I share these builds and test runs on my YouTube channel."
+      ]
+    },
+    {
+      "tag": "hobbies.coffee",
+      "patterns": [
+        "Do you make coffee?",
+        "Tell me about your coffee hobby",
+        "Do you brew coffee?",
+        "Do you experiment with coffee?"
+      ],
+      "responses": [
+        "Yes. I experiment with different brewing methods and beans, often documenting the process as part of my creative hobbies."
+      ]
+    },
+    {
+      "tag": "hobbies.sim_racing",
+      "patterns": [
+        "Do you like gaming?",
+        "Do you do sim racing?",
+        "Do you play racing games?",
+        "Tell me about your sim racing hobby"
+      ],
+      "responses": [
+        "I enjoy sim racing and creating related content, where I mix analysis and entertainment for both enthusiasts and casual audiences."
+      ]
+    },
+    {
+      "tag": "contact.general",
+      "patterns": [
+        "How can I contact you?",
+        "What is your email?",
+        "Can I reach you on LinkedIn?",
+        "What's the best way to contact you?"
+      ],
+      "responses": [
+        "You can reach me via LinkedIn or email, both of which are listed on my portfolio website."
+      ]
+    },
+    {
+      "tag": "contact.youtube",
+      "patterns": [
+        "Do you have a YouTube channel?",
+        "What's your YouTube?",
+        "Do you post videos?",
+        "What kind of content do you share on YouTube?"
+      ],
+      "responses": [
+        "Yes. My channel is called Sunraku-san TV, where I share my hobbies like RC builds, coffee, and sim racing."
+      ]
+    },
+    {
+      "tag": "contact.collab",
+      "patterns": [
+        "Can I collaborate with you?",
+        "Are you open to collaborations?",
+        "Can we work together?",
+        "Do you accept project partners?"
+      ],
+      "responses": [
+        "Yes. I am open to collaborations in software projects, AI experiments, or hobby-related content."
+      ]
+    },
+    {
+      "tag": "contact.consulting",
+      "patterns": [
+        "Do you do consulting?",
+        "Can I hire you as a consultant?",
+        "Do you provide consulting services?",
+        "What consulting do you offer?"
+      ],
+      "responses": [
+        "Yes. I provide consulting in AI chatbot development, front-end architecture with React and Tailwind, QA team management, and BRMS development."
+      ]
+    },
+    {
+      "tag": "limitations.orders",
+      "patterns": [
+        "Can you track my orders?",
+        "Can you check order status?",
+        "Where's my package?",
+        "Do you provide delivery updates?"
+      ],
+      "responses": [
+        "No. This chatbot is a demo and not connected to live systems. Order tracking requires client-provided APIs."
+      ]
+    },
+    {
+      "tag": "limitations.support",
+      "patterns": [
+        "Can you provide real-time customer support?",
+        "Do you offer live chat?",
+        "Can I talk to support?",
+        "Can you connect me to a human?"
+      ],
+      "responses": [
+        "No. This demo is limited to FAQs. Real-time support can be integrated with external live chat or support tools."
+      ]
+    },
+    {
+      "tag": "limitations.scope",
+      "patterns": [
+        "Do you know everything?",
+        "Can you answer anything?",
+        "Are you unlimited?",
+        "Do you have all the answers?"
+      ],
+      "responses": [
+        "No. I only answer questions based on the FAQ dataset provided. For anything outside the dataset, I suggest reaching out directly."
+      ]
+    }
+  ]
+}

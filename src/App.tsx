@@ -1,0 +1,155 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Brain } from 'lucide-react';
+import { Chatbot } from './components/Chatbot';
+import './App.css';
+
+interface ChatbotStatus {
+  isModelReady: boolean;
+  isLoading: boolean;
+  error: string | null;
+  learningCount: number;
+  isConfigured: boolean;
+}
+
+function App() {
+  const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatus>({
+    isModelReady: false,
+    isLoading: true,
+    error: null,
+    learningCount: 0,
+    isConfigured: false
+  });
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Demo content */}
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+            Portfolio Chatbot Demo
+          </h1>
+          <p className="text-xl text-gray-600 mb-8">
+            A showcase of TensorFlow.js intent recognition and OpenAI integration
+          </p>
+          
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              About This Demo
+            </h2>
+            <p className="text-gray-600 mb-6">
+              This chatbot demonstrates Luis's technical expertise by combining local AI processing 
+              with cloud-based AI services. It uses TensorFlow.js for intent classification and 
+              falls back to OpenAI for complex queries.
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-6 text-left">
+              <div className="bg-blue-50 p-6 rounded-xl">
+                <h3 className="text-lg font-semibold text-blue-800 mb-3">
+                  🤖 TensorFlow.js
+                </h3>
+                <ul className="text-blue-700 space-y-2">
+                  <li>• Local intent classification</li>
+                  <li>• FAQ-based responses</li>
+                  <li>• High confidence matching</li>
+                  <li>• Browser-based AI</li>
+                </ul>
+              </div>
+              
+              <div className="bg-purple-50 p-6 rounded-xl">
+                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+                  🧠 OpenAI Integration
+                </h3>
+                <ul className="text-purple-700 space-y-2">
+                  <li>• Fallback for complex queries</li>
+                  <li>• Natural language processing</li>
+                  <li>• Context-aware responses</li>
+                  <li>• Portfolio-specific knowledge</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+              Try the Chatbot
+            </h2>
+            
+            {/* Status indicator */}
+            <div className="mb-6">
+              {chatbotStatus.isLoading ? (
+                <div className="flex items-center justify-center space-x-2 text-sm text-blue-600">
+                  <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span>Training AI model...</span>
+                </div>
+              ) : chatbotStatus.error ? (
+                <div className="text-sm text-yellow-600">
+                  ⚠️ {chatbotStatus.error}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center space-x-2 text-sm text-green-600">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>
+                    {chatbotStatus.isModelReady ? 'AI Ready' : 'Basic Mode'}
+                    {!chatbotStatus.isConfigured && ' (FAQ only)'}
+                  </span>
+                  {chatbotStatus.learningCount > 0 && (
+                    <div className="flex items-center space-x-1 text-xs">
+                      <Brain className="w-3 h-3" />
+                      <span>{chatbotStatus.learningCount} learned</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              Click the chat button in the bottom-right corner to start a conversation. 
+              Ask about Luis's background, skills, services, or hobbies!
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <strong>Sample Questions:</strong>
+                <ul className="mt-2 space-y-1 text-gray-600">
+                  <li>• "What do you do?"</li>
+                  <li>• "Tell me about your skills"</li>
+                  <li>• "Do you build chatbots?"</li>
+                  <li>• "What are your hobbies?"</li>
+                </ul>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <strong>FAQ Categories:</strong>
+                <ul className="mt-2 space-y-1 text-gray-600">
+                  <li>• About & Background</li>
+                  <li>• Services & Projects</li>
+                  <li>• Skills & Technologies</li>
+                  <li>• Hobbies & Interests</li>
+                </ul>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <strong>Technical Features:</strong>
+                <ul className="mt-2 space-y-1 text-gray-600">
+                  <li>• Smooth animations</li>
+                  <li>• Typing indicators</li>
+                  <li>• Source attribution</li>
+                  <li>• Confidence scoring</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Chatbot Component */}
+      <Chatbot 
+        openaiApiKey={process.env.REACT_APP_OPENAI_API_KEY}
+        confidenceThreshold={0.7}
+        onStatusChange={setChatbotStatus}
+      />
+    </div>
+  );
+}
+
+export default App;
