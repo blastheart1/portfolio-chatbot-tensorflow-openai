@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Brain } from 'lucide-react';
+import { Brain, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { Chatbot } from './components/Chatbot';
 import './App.css';
 
@@ -11,6 +11,15 @@ interface ChatbotStatus {
   learningCount: number;
   isConfigured: boolean;
 }
+
+const techStacks = [
+  'React',
+  'TypeScript',
+  'TensorFlow.js',
+  'OpenAI API',
+  'Tailwind CSS',
+  'Framer Motion'
+];
 
 function App() {
   const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatus>({
@@ -148,6 +157,59 @@ function App() {
         confidenceThreshold={0.7}
         onStatusChange={setChatbotStatus}
       />
+      
+      {/* Footer */}
+      <footer className="w-full mt-6 py-6 flex flex-col items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+        <p>
+          Developed by{" "}
+          <a
+            href="https://my-portfolio-jusu.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline hover:text-blue-600 transition-colors"
+          >
+            Luis
+          </a>
+        </p>
+
+        <div className="flex flex-wrap justify-center gap-2">
+          {techStacks.map((tech) => (
+            <span
+              key={tech}
+              className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-2 py-1 rounded-full text-xs font-medium"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 mt-2">
+          <a
+            href="https://www.instagram.com/0xlv1s_"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors"
+          >
+            <Instagram className="w-5 h-5" />
+          </a>
+          <a
+            href="https://www.facebook.com/AntonioLuisASantos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
+          >
+            <Facebook className="w-5 h-5" />
+          </a>
+          <a
+            href="https://www.linkedin.com/in/alasantos01/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-600 dark:text-gray-300 hover:text-blue-700 transition-colors"
+          >
+            <Linkedin className="w-5 h-5" />
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
