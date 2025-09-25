@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, X, Brain, Save, XCircle } from 'lucide-react';
 import { MessageBubble, Message } from './MessageBubble';
@@ -57,6 +57,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     fromEmail: process.env.REACT_APP_FROM_EMAIL || 'noreply@yourdomain.com',
     toEmail: process.env.REACT_APP_TO_EMAIL || 'your-email@example.com'
   }));
+
+  // Generate unique IDs to prevent duplicate keys
+  const generateUniqueId = useCallback(() => {
+    return `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }, []);
 
   // Detect dark mode
   useEffect(() => {
@@ -239,7 +244,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       content: inputValue.trim(),
       isUser: true,
       timestamp: new Date(),
@@ -262,7 +267,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         if (prediction) {
           // High confidence TensorFlow match - this is our primary response
           response = {
-            id: (Date.now() + 1).toString(),
+            id: generateUniqueId(),
             content: prediction.response,
             isUser: false,
             timestamp: new Date(),
@@ -278,7 +283,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           if (fallbackPrediction) {
             // Use direct Luis answer
             response = {
-              id: (Date.now() + 1).toString(),
+              id: generateUniqueId(),
               content: fallbackPrediction.response,
               isUser: false,
               timestamp: new Date(),
@@ -295,7 +300,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                 openAiResponse = aiResponse.content;
                 usedOpenAI = true;
                 response = {
-                  id: (Date.now() + 1).toString(),
+                  id: generateUniqueId(),
                   content: formatAIResponse(aiResponse.content),
                   isUser: false,
                   timestamp: new Date(),
@@ -304,7 +309,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               } catch (openaiError) {
                 console.warn('OpenAI error, using simple fallback:', openaiError);
                 response = {
-                  id: (Date.now() + 1).toString(),
+                  id: generateUniqueId(),
                   content: "I'm not sure about that specific question. Feel free to reach out to me directly for more detailed discussions!",
                   isUser: false,
                   timestamp: new Date(),
@@ -314,7 +319,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             } else {
               // No OpenAI, simple fallback
               response = {
-                id: (Date.now() + 1).toString(),
+                id: generateUniqueId(),
                 content: "I'm not sure about that specific question. Feel free to reach out to me directly for more detailed discussions!",
                 isUser: false,
                 timestamp: new Date(),
@@ -329,7 +334,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         const simpleMatch = findSimpleFAQMatch(userMessage.content);
         if (simpleMatch) {
           response = {
-            id: (Date.now() + 1).toString(),
+            id: generateUniqueId(),
             content: simpleMatch.response,
             isUser: false,
             timestamp: new Date(),
@@ -341,7 +346,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             openAiResponse = aiResponse.content;
             usedOpenAI = true;
             response = {
-              id: (Date.now() + 1).toString(),
+              id: generateUniqueId(),
               content: formatAIResponse(aiResponse.content),
               isUser: false,
               timestamp: new Date(),
@@ -350,7 +355,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           } catch (openaiError) {
             console.warn('OpenAI error, falling back to FAQ:', openaiError);
             response = {
-              id: (Date.now() + 1).toString(),
+              id: generateUniqueId(),
               content: "I'm not sure about that. You can reach out to Luis directly for more specific questions!",
               isUser: false,
               timestamp: new Date(),
@@ -359,7 +364,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           }
         } else {
           response = {
-            id: (Date.now() + 1).toString(),
+            id: generateUniqueId(),
             content: "I'm not sure about that. You can reach out to Luis directly for more specific questions!",
             isUser: false,
             timestamp: new Date(),
@@ -389,7 +394,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           // Instead of showing form immediately, ask if they want to discuss further
           setTimeout(() => {
             const followUpMessage: Message = {
-              id: (Date.now() + 2).toString(),
+              id: generateUniqueId(),
               content: `${leadTrigger.triggerContext} Would you like me to reach out to discuss your project needs in more detail?`,
               isUser: false,
               timestamp: new Date(),
@@ -420,7 +425,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             // Provide a polite acknowledgment
             setTimeout(() => {
               const acknowledgmentMessage: Message = {
-                id: (Date.now() + 3).toString(),
+                id: generateUniqueId(),
                 content: "No problem at all! Feel free to reach out anytime if you have questions about my services. I'm here to help whenever you're ready!",
                 isUser: false,
                 timestamp: new Date(),
@@ -446,7 +451,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     } catch (error) {
       console.error('Error generating response:', error);
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateUniqueId(),
         content: "Sorry, I encountered an error. Please try again or contact Luis directly.",
         isUser: false,
         timestamp: new Date(),
@@ -535,7 +540,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         if (!result.success) {
           // Show error message to user
           const errorMessage: Message = {
-            id: `error_${Date.now()}`,
+            id: generateUniqueId(),
             content: `❌ Learning failed: ${result.reason}`,
             isUser: false,
             timestamp: new Date(),
@@ -545,7 +550,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         } else {
           // Show success message
           const successMessage: Message = {
-            id: `success_${Date.now()}`,
+            id: generateUniqueId(),
             content: "✅ I've learned from this example and will remember it for future conversations!",
             isUser: false,
             timestamp: new Date(),
