@@ -214,10 +214,7 @@ export default async function handler(req, res) {
                   ✅ Your ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project Inquiry
                 </h2>
                 <p style="margin: 0; color: #4a5568; line-height: 1.6;">
-                  I've received your inquiry and I'm excited to learn more about your project! 
-                  As a Senior IBM ODM Specialist (BRMS) and QA Team Manager, I specialize in 
-                  <strong>Full-Stack Development</strong> and leveraging <strong>AI, machine learning, 
-                  and generative technologies</strong> to elevate business processes.
+                  Thank you for your inquiry. I've received your message and will carefully review your project needs. My goal is to ensure you get the right solution, and I'll be in touch shortly with more details on how we can move forward.
                 </p>
               </div>
 
