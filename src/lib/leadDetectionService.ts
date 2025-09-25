@@ -14,7 +14,13 @@ export class LeadDetectionService {
     ],
     services: [
       'build', 'create', 'develop', 'make', 'design', 'website', 'app', 'software',
-      'need a', 'looking for', 'want to', 'require', 'project', 'help me'
+      'need a', 'looking for', 'want to', 'require', 'project', 'help me',
+      'services', 'what services', 'offer', 'what do you offer', 'what can you do',
+      'service', 'work', 'consulting', 'development', 'chatbot', 'ai solution',
+      'ecommerce', 'e-commerce', 'online store', 'web development', 'full stack',
+      'frontend', 'backend', 'react', 'node', 'javascript', 'typescript',
+      'brms', 'business rules', 'qa', 'quality assurance', 'team management',
+      'ibm odm', 'odm specialist', 'automation', 'workflow', 'integration'
     ],
     availability: [
       'available', 'busy', 'schedule', 'timeline', 'when can', 'how long',
@@ -30,7 +36,13 @@ export class LeadDetectionService {
   private buyingIntentPhrases = [
     'i need', 'i want', 'i\'m looking for', 'can you help me',
     'i\'m interested in', 'tell me more about', 'how do you',
-    'what would it take', 'i\'m ready to', 'let\'s discuss'
+    'what would it take', 'i\'m ready to', 'let\'s discuss',
+    'what services', 'what do you offer', 'what can you do',
+    'do you offer', 'can you build', 'can you create', 'can you develop',
+    'i need a website', 'i need an app', 'i need a chatbot',
+    'build me a', 'create a', 'develop a', 'make a',
+    'looking to hire', 'looking to work with', 'want to hire',
+    'need help with', 'need assistance with', 'need support with'
   ];
 
   // Negative indicators (don't show form)
@@ -156,7 +168,11 @@ export class LeadDetectionService {
         "That sounds like an interesting project!",
         "I'd love to help you with that!",
         "That's definitely something I can help you build!",
-        "I'm excited about your project idea!"
+        "I'm excited about your project idea!",
+        "Great! I offer a range of services that could help you!",
+        "I'd be happy to discuss my services with you!",
+        "That's exactly the kind of project I specialize in!",
+        "I can definitely help you with that type of work!"
       ],
       availability: [
         "I'd love to discuss your timeline!",

@@ -51,6 +51,20 @@ export const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({
       triggerLead: true
     },
     {
+      id: 'ecommerce',
+      text: 'Can you build an e-commerce site?',
+      icon: <Code className="w-4 h-4" />,
+      category: 'services',
+      triggerLead: true
+    },
+    {
+      id: 'consulting',
+      text: 'Do you offer consulting services?',
+      icon: <Briefcase className="w-4 h-4" />,
+      category: 'services',
+      triggerLead: true
+    },
+    {
       id: 'about',
       text: 'Tell me about yourself',
       icon: <Users className="w-4 h-4" />,

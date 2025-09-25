@@ -239,7 +239,24 @@
         "Tell me about your services",
         "What work do you do?",
         "What can you build for me?",
-        "What solutions do you provide?"
+        "What solutions do you provide?",
+        "What do you offer?",
+        "What services do you provide?",
+        "What can you do for me?",
+        "What kind of services do you have?",
+        "What are your services?",
+        "Do you offer services?",
+        "What services are you offering?",
+        "What can you help with?",
+        "What do you specialize in?",
+        "What's your expertise?",
+        "What do you work on?",
+        "What projects do you take?",
+        "What can you create?",
+        "What can you develop?",
+        "What can you build?",
+        "What do you make?",
+        "What solutions do you offer?"
       ],
       "responses": [
         "Hello! I offer a range of services tailored to meet your needs. Here are some of the services I provide:\n\n**1. Website Development**\nI offer three packages to cater to different requirements:\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses  \n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using:\n• React, Next.js, TypeScript\n• Node.js, Express, PostgreSQL\n• AI/ML integration and generative technologies\n\n**4. BRMS Solutions**\nAs a Senior IBM ODM Specialist, I provide Business Rule Management Systems for enterprise solutions.\n\n**5. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!"
