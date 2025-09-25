@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Brain, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { Chatbot } from './components/Chatbot';
 import Embed from './pages/Embed';
@@ -53,33 +52,36 @@ function App() {
               About This Demo
             </h2>
             <p className="text-gray-600 mb-6">
-              This chatbot demonstrates Luis's technical expertise by combining local AI processing 
-              with cloud-based AI services. It uses TensorFlow.js for intent classification and 
-              falls back to OpenAI for complex queries.
+              This chatbot showcases Luis's AI expertise with TensorFlow.js as the primary intelligence, 
+              specifically trained on his professional content. It uses relevance scoring to stay focused 
+              on Luis's background, skills, and projects, with OpenAI only as a last resort for highly 
+              relevant questions.
             </p>
             
             <div className="grid md:grid-cols-2 gap-6 text-left">
               <div className="bg-blue-50 p-6 rounded-xl">
                 <h3 className="text-lg font-semibold text-blue-800 mb-3">
-                  🤖 TensorFlow.js
+                  🤖 TensorFlow.js (Primary Intelligence)
                 </h3>
                 <ul className="text-blue-700 space-y-2">
-                  <li>• Local intent classification</li>
-                  <li>• FAQ-based responses</li>
-                  <li>• High confidence matching</li>
-                  <li>• Browser-based AI</li>
+                  <li>• Luis-focused intent classification</li>
+                  <li>• Relevance scoring system</li>
+                  <li>• Enhanced neural network architecture</li>
+                  <li>• Self-improving from conversations</li>
+                  <li>• Smart fallback responses</li>
+                  <li>• Local browser-based AI</li>
                 </ul>
               </div>
               
               <div className="bg-purple-50 p-6 rounded-xl">
                 <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  🧠 OpenAI Integration
+                  🧠 OpenAI Integration (Last Resort Only)
                 </h3>
                 <ul className="text-purple-700 space-y-2">
-                  <li>• Fallback for complex queries</li>
-                  <li>• Natural language processing</li>
-                  <li>• Context-aware responses</li>
-                  <li>• Portfolio-specific knowledge</li>
+                  <li>• Only for highly relevant Luis questions</li>
+                  <li>• When TensorFlow confidence is low</li>
+                  <li>• Luis-focused context only</li>
+                  <li>• Not a general GPT wrapper</li>
                 </ul>
               </div>
             </div>
@@ -161,7 +163,7 @@ function App() {
       {/* Chatbot Component */}
       <Chatbot 
         openaiApiKey={process.env.REACT_APP_OPENAI_API_KEY}
-        confidenceThreshold={0.7}
+        confidenceThreshold={0.6}
         onStatusChange={setChatbotStatus}
       />
       

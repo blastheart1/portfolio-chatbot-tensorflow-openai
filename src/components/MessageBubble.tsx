@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { MarkdownText } from './MarkdownText';
 
 export interface Message {
   id: string;
@@ -8,6 +9,7 @@ export interface Message {
   timestamp: Date;
   source?: 'faq' | 'ai';
   confidence?: number;
+  relevance?: number;
 }
 
 interface MessageBubbleProps {
@@ -34,7 +36,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         }`}
       >
         <div className="text-sm leading-relaxed">
-          {message.content}
+          {!isUser ? (
+            <MarkdownText content={message.content} />
+          ) : (
+            message.content
+          )}
         </div>
         
         {/* Source indicator for bot messages */}
@@ -42,16 +48,25 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           <div className="mt-2 text-xs opacity-70">
             {source === 'faq' ? (
               <span className="inline-flex items-center">
-                📚 FAQ
+                📚 TensorFlow
                 {confidence && (
                   <span className="ml-1">
-                    ({Math.round(confidence * 100)}% confidence)
+                    ({Math.round(confidence * 100)}% confidence
+                    {message.relevance && (
+                      <span>, {Math.round(message.relevance * 100)}% relevance</span>
+                    )}
+                    )
                   </span>
                 )}
               </span>
             ) : (
               <span className="inline-flex items-center">
                 🤖 AI Response
+                {message.relevance && (
+                  <span className="ml-1">
+                    ({Math.round(message.relevance * 100)}% Luis relevance)
+                  </span>
+                )}
               </span>
             )}
           </div>

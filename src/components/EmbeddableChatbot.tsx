@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { TensorFlowService } from '../lib/tensorflowModel';
 import { OpenAIService } from '../lib/openaiService';

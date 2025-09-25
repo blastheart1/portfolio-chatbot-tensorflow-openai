@@ -17,6 +17,27 @@ export interface OpenAIResponse {
 export class OpenAIService {
   private config: OpenAIConfig;
 
+  // Content filtering for inappropriate content
+  private inappropriateWords: string[] = [
+    // English profanity
+    'fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'crap', 'piss',
+    // Filipino profanity and slang
+    'tite', 'puke', 'puki', 'puta', 'gago', 'tangina', 'ulol', 'bobo',
+    'tanga', 'walanghiya', 'lintik', 'hayop', 'pokpok', 'putang',
+    // Relationship/personal inappropriate words (standalone)
+    'girls', 'boys', 'women', 'men', 'sex', 'sexy', 'hot', 'beautiful', 
+    'cute', 'attractive', 'single', 'girlfriend', 'boyfriend', 'wife', 
+    'husband', 'marriage', 'dating', 'love', 'kiss', 'hug'
+  ];
+
+  private inappropriatePatterns: string[] = [
+    'do you like girls', 'are you single', 'do you have a girlfriend',
+    'are you married', 'do you have a wife', 'are you dating',
+    'do you like women', 'are you straight', 'do you like boys',
+    'what do you think about girls', 'do you find me attractive',
+    'are you gay', 'whats your type', 'do you want to date'
+  ];
+
   constructor(config: OpenAIConfig) {
     this.config = {
       model: 'gpt-3.5-turbo',
@@ -27,9 +48,72 @@ export class OpenAIService {
   }
 
   /**
+   * Check for inappropriate content
+   */
+  private isInappropriateContent(text: string): { isInappropriate: boolean, type: 'profanity' | 'personal' | 'none' } {
+    const lowerText = text.toLowerCase().trim();
+    
+    // Check for profanity (exact word matches to avoid false positives)
+    const profanityWords = ['fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'crap', 'piss',
+                           'tite', 'puke', 'puki', 'puta', 'gago', 'tangina', 'ulol', 'bobo',
+                           'tanga', 'walanghiya', 'lintik', 'hayop', 'pokpok', 'putang'];
+    
+    const hasProfanity = profanityWords.some(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      return regex.test(lowerText);
+    });
+    
+    if (hasProfanity) {
+      return { isInappropriate: true, type: 'profanity' };
+    }
+    
+    // Check for personal/inappropriate questions
+    const personalWords = ['girls', 'boys', 'women', 'men', 'sex', 'sexy', 'hot', 'beautiful', 
+                           'cute', 'attractive', 'single', 'girlfriend', 'boyfriend', 'wife', 
+                           'husband', 'marriage', 'dating', 'love', 'kiss', 'hug'];
+    
+    const hasPersonalWord = personalWords.some(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      return regex.test(lowerText);
+    });
+    
+    const hasPersonalQuestion = this.inappropriatePatterns.some(pattern => lowerText.includes(pattern));
+    
+    if (hasPersonalWord || hasPersonalQuestion) {
+      return { isInappropriate: true, type: 'personal' };
+    }
+    
+    return { isInappropriate: false, type: 'none' };
+  }
+
+  /**
    * Generate response using OpenAI API
    */
   async generateResponse(userMessage: string, context?: string): Promise<OpenAIResponse> {
+    // Check for inappropriate content first
+    const contentCheck = this.isInappropriateContent(userMessage);
+    if (contentCheck.isInappropriate) {
+      console.log(`🚫 OpenAI inappropriate content detected (${contentCheck.type}): "${userMessage}"`);
+      let response: string;
+      
+      if (contentCheck.type === 'profanity') {
+        response = "Sorry, I'd be happy to discuss more valuable topics and let's not waste time. How about we talk about my **website development services**, **AI chatbot solutions**, or my **technical expertise** instead?";
+      } else if (contentCheck.type === 'personal') {
+        response = "I'm married and prefer to keep our conversation professional. I'd be happy to discuss my **services**, **projects**, or **technical skills** instead. What can I help you with professionally?";
+      } else {
+        response = "Let's focus on professional topics. I'd be happy to discuss my **development services**, **AI solutions**, or **portfolio projects**. What interests you?";
+      }
+      
+      return {
+        content: response,
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0
+        }
+      };
+    }
+
     try {
       const systemPrompt = context || 
         "You are a helpful AI assistant. Provide concise, helpful responses. " +
@@ -83,6 +167,30 @@ export class OpenAIService {
    * Generate response with portfolio context
    */
   async generatePortfolioResponse(userMessage: string): Promise<OpenAIResponse> {
+    // Check for inappropriate content first
+    const contentCheck = this.isInappropriateContent(userMessage);
+    if (contentCheck.isInappropriate) {
+      console.log(`🚫 OpenAI portfolio inappropriate content detected (${contentCheck.type}): "${userMessage}"`);
+      let response: string;
+      
+      if (contentCheck.type === 'profanity') {
+        response = "Sorry, I'd be happy to discuss more valuable topics and let's not waste time. How about we talk about my **website development services**, **AI chatbot solutions**, or my **technical expertise** instead?";
+      } else if (contentCheck.type === 'personal') {
+        response = "I'm married and prefer to keep our conversation professional. I'd be happy to discuss my **services**, **projects**, or **technical skills** instead. What can I help you with professionally?";
+      } else {
+        response = "Let's focus on professional topics. I'd be happy to discuss my **development services**, **AI solutions**, or **portfolio projects**. What interests you?";
+      }
+      
+      return {
+        content: response,
+        usage: {
+          prompt_tokens: 0,
+          completion_tokens: 0,
+          total_tokens: 0
+        }
+      };
+    }
+
     const context = 
       "You are Luis (Antonio Luis Santos), a software developer and team manager. " +
       "You are a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards. " +
@@ -125,7 +233,17 @@ export class OpenAIService {
       "Respond naturally and conversationally as if you're having a direct conversation. " +
       "Start responses with natural language like 'Yes, I...' or 'I have experience in...' or 'That's a great question...' " +
       "Be professional but friendly and engaging. " +
-      "If asked about something outside your expertise, politely redirect to your core skills.";
+      "If asked about something outside your expertise, politely redirect to your core skills. " +
+      
+      "FORMATTING: " +
+      "Use simple markdown formatting for better readability: " +
+      "• Use **bold** for important terms and headings " +
+      "• Use bullet points (•) for lists " +
+      "• Use line breaks for better structure " +
+      "• Keep formatting minimal but effective " +
+      
+      "EXAMPLES: " +
+      "Pricing: **Pricing Plans:** • **Starter** (₱22,000/$599) - Small businesses • **Professional** (₱45,000/$1,199) - Growing businesses • **Enterprise** (₱100,000/$2,999) - Complete solution";
 
     return this.generateResponse(userMessage, context);
   }

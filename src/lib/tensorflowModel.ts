@@ -15,15 +15,57 @@ export interface ClassificationResult {
   tag: string;
   confidence: number;
   response: string;
+  relevance: number; // How relevant this is to Luis's content (0-1)
+  source: 'faq' | 'learned' | 'fallback';
 }
 
 export class TensorFlowService {
   private model: tf.LayersModel | null = null;
   private vocabulary: string[] = [];
   private intents: IntentData[] = [];
-  private confidenceThreshold = 0.75;
+  private confidenceThreshold = 0.6; // Lowered for better matching
+  private relevanceThreshold = 0.4; // Lowered to allow more relevant questions
+  private luisKeywords: string[] = [
+    // Personal keywords
+    'luis', 'antonio', 'santos', 'developer', 'software', 'programmer',
+    // Professional keywords
+    'ibm', 'odm', 'brms', 'bell', 'canada', 'qa', 'quality', 'assurance',
+    'team', 'manager', 'lead', 'leadership', 'specialist',
+    // Technical keywords
+    'typescript', 'javascript', 'react', 'tailwind', 'node', 'express',
+    'postgresql', 'python', 'java', 'c++', 'php', 'mysql',
+    'docker', 'aws', 'vercel', 'git', 'github', 'netlify',
+    // Project keywords
+    'chatbot', 'ai', 'tensorflow', 'openai', 'portfolio', 'website',
+    'pilates', 'bee', 'resumeai', 'lm', 'studio',
+    // Hobby keywords
+    'cycling', 'road', 'gravel', 'formula', 'f1', 'racing', 'sim',
+    'rc', 'cars', 'tamiya', 'coffee', 'brewing', 'youtube', 'sunraku'
+  ];
 
-  constructor(confidenceThreshold: number = 0.75) {
+  // Inappropriate content filter
+  private inappropriateWords: string[] = [
+    // English profanity
+    'fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'crap', 'piss',
+    // Filipino profanity and slang
+    'tite', 'puke', 'puki', 'puta', 'gago', 'tangina', 'ulol', 'bobo',
+    'tanga', 'walanghiya', 'lintik', 'hayop', 'pokpok', 'putang',
+    // Relationship/personal inappropriate words (standalone)
+    'girls', 'boys', 'women', 'men', 'sex', 'sexy', 'hot', 'beautiful', 
+    'cute', 'attractive', 'single', 'girlfriend', 'boyfriend', 'wife', 
+    'husband', 'marriage', 'dating', 'love', 'kiss', 'hug'
+  ];
+
+  // Personal/inappropriate question patterns
+  private inappropriatePatterns: string[] = [
+    'do you like girls', 'are you single', 'do you have a girlfriend',
+    'are you married', 'do you have a wife', 'are you dating',
+    'do you like women', 'are you straight', 'do you like boys',
+    'what do you think about girls', 'do you find me attractive',
+    'are you gay', 'whats your type', 'do you want to date'
+  ];
+
+  constructor(confidenceThreshold: number = 0.6) {
     this.confidenceThreshold = confidenceThreshold;
   }
 
@@ -32,8 +74,8 @@ export class TensorFlowService {
    */
   private async loadAllData(): Promise<TrainingData> {
     try {
-      // Load static intents
-      const staticIntents = await import('../data/intents.json');
+      // Load static intents from faq.json (the comprehensive dataset)
+      const staticIntents = await import('../data/faq.json');
       
       // Load user examples
       const userExamples = await import('../data/user_examples.json');
@@ -44,12 +86,18 @@ export class TensorFlowService {
         ...userExamples.intents
       ];
 
+      console.log(`📚 Loaded ${staticIntents.intents.length} FAQ intents + ${userExamples.intents.length} learned examples`);
       return { intents: allIntents };
     } catch (error) {
       console.error('Error loading training data:', error);
-      // Fallback to static intents only
-      const staticIntents = await import('../data/intents.json');
-      return staticIntents;
+      // Fallback to intents.json if faq.json fails
+      try {
+        const staticIntents = await import('../data/intents.json');
+        return staticIntents;
+      } catch (fallbackError) {
+        console.error('Fallback loading also failed:', fallbackError);
+        throw new Error('Unable to load training data');
+      }
     }
   }
 
@@ -71,6 +119,89 @@ export class TensorFlowService {
     });
     
     return bag;
+  }
+
+  /**
+   * Check for inappropriate content
+   */
+  private isInappropriateContent(text: string): { isInappropriate: boolean, type: 'profanity' | 'personal' | 'none' } {
+    const lowerText = text.toLowerCase().trim();
+    
+    // Check for profanity (exact word matches to avoid false positives)
+    const profanityWords = ['fuck', 'shit', 'damn', 'bitch', 'ass', 'hell', 'crap', 'piss',
+                           'tite', 'puke', 'puki', 'puta', 'gago', 'tangina', 'ulol', 'bobo',
+                           'tanga', 'walanghiya', 'lintik', 'hayop', 'pokpok', 'putang'];
+    
+    const hasProfanity = profanityWords.some(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      return regex.test(lowerText);
+    });
+    
+    if (hasProfanity) {
+      return { isInappropriate: true, type: 'profanity' };
+    }
+    
+    // Check for personal/inappropriate questions
+    const personalWords = ['girls', 'boys', 'women', 'men', 'sex', 'sexy', 'hot', 'beautiful', 
+                           'cute', 'attractive', 'single', 'girlfriend', 'boyfriend', 'wife', 
+                           'husband', 'marriage', 'dating', 'love', 'kiss', 'hug'];
+    
+    const hasPersonalWord = personalWords.some(word => {
+      const regex = new RegExp(`\\b${word}\\b`, 'i');
+      return regex.test(lowerText);
+    });
+    
+    const hasPersonalQuestion = this.inappropriatePatterns.some(pattern => lowerText.includes(pattern));
+    
+    if (hasPersonalWord || hasPersonalQuestion) {
+      return { isInappropriate: true, type: 'personal' };
+    }
+    
+    return { isInappropriate: false, type: 'none' };
+  }
+
+  /**
+   * Calculate relevance score to Luis's content (0-1)
+   */
+  private calculateRelevance(text: string): number {
+    const words = text.toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(word => word.length > 0);
+    
+    if (words.length === 0) return 0;
+    
+    const relevantWords = words.filter(word => 
+      this.luisKeywords.some(keyword => 
+        word.includes(keyword) || keyword.includes(word)
+      )
+    );
+    
+    // Base relevance from keyword matches
+    let relevance = relevantWords.length / words.length;
+    
+    // Boost for direct personal references
+    const personalRefs = ['luis', 'antonio', 'santos', 'you', 'your'];
+    const hasPersonalRef = words.some(word => 
+      personalRefs.some(ref => word.includes(ref))
+    );
+    if (hasPersonalRef) relevance += 0.2;
+    
+    // Boost for professional/technical terms
+    const professionalTerms = ['developer', 'software', 'programming', 'code', 'project'];
+    const hasProfessionalRef = words.some(word => 
+      professionalTerms.some(term => word.includes(term))
+    );
+    if (hasProfessionalRef) relevance += 0.1;
+    
+    // Boost for hobby/interest terms
+    const hobbyTerms = ['cycling', 'coffee', 'racing', 'rc', 'youtube'];
+    const hasHobbyRef = words.some(word => 
+      hobbyTerms.some(hobby => word.includes(hobby))
+    );
+    if (hasHobbyRef) relevance += 0.1;
+    
+    return Math.min(relevance, 1.0);
   }
 
   /**
@@ -111,26 +242,43 @@ export class TensorFlowService {
   }
 
   /**
-   * Create and compile the model
+   * Create and compile the model with enhanced architecture
    */
   private createModel(vocabSize: number, numIntents: number): tf.LayersModel {
     const model = tf.sequential({
       layers: [
+        // Enhanced input layer with more capacity
         tf.layers.dense({
           inputShape: [vocabSize],
+          units: 256,
+          activation: 'relu',
+          kernelRegularizer: tf.regularizers.l2({ l2: 0.001 }),
+        }),
+        tf.layers.dropout({
+          rate: 0.2,
+        }),
+        
+        // Hidden layer with batch normalization
+        tf.layers.dense({
           units: 128,
           activation: 'relu',
+          kernelRegularizer: tf.regularizers.l2({ l2: 0.001 }),
         }),
+        tf.layers.batchNormalization(),
         tf.layers.dropout({
           rate: 0.3,
         }),
+        
+        // Additional hidden layer for better feature extraction
         tf.layers.dense({
           units: 64,
           activation: 'relu',
         }),
         tf.layers.dropout({
-          rate: 0.3,
+          rate: 0.2,
         }),
+        
+        // Output layer
         tf.layers.dense({
           units: numIntents,
           activation: 'softmax',
@@ -138,8 +286,11 @@ export class TensorFlowService {
       ],
     });
 
+    // Enhanced optimizer with learning rate scheduling
+    const optimizer = tf.train.adam(0.001);
+    
     model.compile({
-      optimizer: 'adam',
+      optimizer: optimizer,
       loss: 'sparseCategoricalCrossentropy',
       metrics: ['accuracy'],
     });
@@ -164,12 +315,20 @@ export class TensorFlowService {
     // Create and compile model
     this.model = this.createModel(this.vocabulary.length, data.intents.length);
     
-    // Train the model
+    // Enhanced training with early stopping and better parameters
     await this.model.fit(inputTensor, labelTensor, {
-      epochs: 100,
-      batchSize: 32,
+      epochs: 150,
+      batchSize: 16,
       validationSplit: 0.2,
       verbose: 0,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          // Log training progress
+          if (epoch % 25 === 0) {
+            console.log(`Epoch ${epoch}: loss=${logs?.loss?.toFixed(4)}, accuracy=${logs?.acc?.toFixed(4)}`);
+          }
+        }
+      }
     });
     
     // Save model
@@ -181,35 +340,70 @@ export class TensorFlowService {
   }
 
   /**
-   * Classify input text
+   * Classify input text with enhanced relevance scoring
    */
   async classifyInput(text: string): Promise<ClassificationResult | null> {
     if (!this.model) {
       throw new Error('Model not trained yet');
     }
 
-    const bag = this.createBagOfWords(text);
-    const inputTensor = tf.tensor2d([bag]);
-    const prediction = this.model.predict(inputTensor) as tf.Tensor;
-    const predictionArray = await prediction.data();
-    
-    inputTensor.dispose();
-    prediction.dispose();
+    // Check for inappropriate content first
+    const contentCheck = this.isInappropriateContent(text);
+    if (contentCheck.isInappropriate) {
+      console.log(`🚫 Inappropriate content detected (${contentCheck.type}): "${text}"`);
+      return null;
+    }
 
-    const maxIndex = predictionArray.indexOf(Math.max(...predictionArray));
-    const confidence = predictionArray[maxIndex];
+    // Calculate relevance to Luis's content first
+    const relevance = this.calculateRelevance(text);
     
-    if (confidence < this.confidenceThreshold) {
+    // If relevance is too low, don't even try to classify
+    if (relevance < this.relevanceThreshold) {
+      console.log(`❌ Low relevance (${relevance.toFixed(2)}) to Luis content: "${text}"`);
+      return null;
+    }
+
+    console.log(`🔍 Analyzing: "${text}" (relevance: ${relevance.toFixed(2)})`);
+    console.log(`📊 Available intents: ${this.intents.length}`);
+
+    // Use tf.tidy for automatic memory management
+    const result = tf.tidy(() => {
+      const bag = this.createBagOfWords(text);
+      const inputTensor = tf.tensor2d([bag]);
+      const prediction = this.model!.predict(inputTensor) as tf.Tensor;
+      return prediction;
+    });
+
+    const predictionArray = await result.data();
+    result.dispose();
+
+    // Convert typed array to regular array for easier manipulation
+    const scores = Array.from(predictionArray);
+    const maxIndex = scores.indexOf(Math.max(...scores));
+    const confidence = scores[maxIndex];
+    
+    console.log(`🎯 Prediction scores: ${scores.map((score, i) => `${this.intents[i]?.tag || 'unknown'}:${score.toFixed(3)}`).join(', ')}`);
+    console.log(`🏆 Best match: ${this.intents[maxIndex]?.tag} (confidence: ${confidence.toFixed(3)})`);
+    
+    // Enhanced confidence threshold based on relevance
+    const adjustedThreshold = this.confidenceThreshold * (0.8 + 0.2 * relevance);
+    
+    if (confidence < adjustedThreshold) {
+      console.log(`❌ Low confidence (${confidence.toFixed(2)}) for: "${text}" (threshold: ${adjustedThreshold.toFixed(2)})`);
       return null;
     }
 
     const intent = this.intents[maxIndex];
     const response = intent.responses[Math.floor(Math.random() * intent.responses.length)];
 
+    console.log(`✅ TensorFlow match: "${text}" -> ${intent.tag} (confidence: ${confidence.toFixed(2)}, relevance: ${relevance.toFixed(2)})`);
+
     return {
       tag: intent.tag,
       confidence,
       response,
+      relevance,
+      source: intent.tag.startsWith('learned_') ? 'learned' : 'faq',
     };
   }
 
@@ -262,6 +456,106 @@ export class TensorFlowService {
    */
   isModelReady(): boolean {
     return this.model !== null;
+  }
+
+  /**
+   * Generate Luis-focused fallback response when TensorFlow doesn't match
+   */
+  generateLuisFallback(userInput: string): ClassificationResult | null {
+    // Check for inappropriate content first
+    const contentCheck = this.isInappropriateContent(userInput);
+    if (contentCheck.isInappropriate) {
+      let response: string;
+      
+      if (contentCheck.type === 'profanity') {
+        response = "Sorry, I'd be happy to discuss more valuable topics and let's not waste time. How about we talk about my **website development services**, **AI chatbot solutions**, or my **technical expertise** instead?";
+      } else if (contentCheck.type === 'personal') {
+        response = "I'm married and prefer to keep our conversation professional. I'd be happy to discuss my **services**, **projects**, or **technical skills** instead. What can I help you with professionally?";
+      } else {
+        response = "Let's focus on professional topics. I'd be happy to discuss my **development services**, **AI solutions**, or **portfolio projects**. What interests you?";
+      }
+      
+      return {
+        tag: 'luis.inappropriate_filter',
+        confidence: 0.9,
+        response,
+        relevance: 0.1,
+        source: 'fallback'
+      };
+    }
+
+    const relevance = this.calculateRelevance(userInput);
+    
+    // For low relevance topics, don't respond at all - let OpenAI handle it
+    if (relevance < 0.3) {
+      console.log(`❌ Low relevance (${relevance.toFixed(2)}), letting OpenAI handle: "${userInput}"`);
+      return null;
+    }
+    
+    // For relevant topics that didn't match, provide direct Luis answers
+    const lowerInput = userInput.toLowerCase();
+    
+    // Direct answers for common questions that should have matched
+    if (lowerInput.includes('what do you do') || lowerInput.includes('what do you work') || lowerInput.includes('what\'s your job')) {
+      return {
+        tag: 'luis.direct_answer',
+        confidence: 0.8,
+        response: "I'm a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards. I'm also a Full-Stack Developer who leverages AI, machine learning, and generative technologies to elevate business processes, automate complex workflows, and create intelligent solutions that drive measurable results.",
+        relevance,
+        source: 'faq'
+      };
+    }
+    
+    if (lowerInput.includes('pricing') || lowerInput.includes('cost') || lowerInput.includes('price') || lowerInput.includes('rate')) {
+      return {
+        tag: 'luis.direct_answer',
+        confidence: 0.8,
+        response: "I offer three website packages: Starter at ₱22,000 ($599 overseas), Professional at ₱45,000 ($1,199 overseas), and Enterprise at ₱100,000 ($2,999 overseas). All include responsive design, SEO, hosting, and AI chatbot integration.",
+        relevance,
+        source: 'faq'
+      };
+    }
+    
+    if (lowerInput.includes('ecommerce') || lowerInput.includes('e-commerce') || lowerInput.includes('online store') || lowerInput.includes('shop')) {
+      return {
+        tag: 'luis.direct_answer',
+        confidence: 0.8,
+        response: "Yes, I can build e-commerce sites! I create full-featured online stores with payment integration, inventory management, and AI chatbot support. I use modern tech stacks like React, Node.js, and integrate with platforms like Stripe for payments.",
+        relevance,
+        source: 'faq'
+      };
+    }
+    
+    if (lowerInput.includes('services') || lowerInput.includes('what services') || lowerInput.includes('what can you help') || lowerInput.includes('solutions')) {
+      return {
+        tag: 'luis.direct_answer',
+        confidence: 0.8,
+        response: "Hello! I offer a range of services tailored to meet your needs:\n\n**1. Website Development**\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses\n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using React, Next.js, TypeScript, Node.js, Express, and PostgreSQL.\n\n**4. BRMS Solutions**\nAs a Senior IBM ODM Specialist, I provide Business Rule Management Systems for enterprise solutions.\n\n**5. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!",
+        relevance,
+        source: 'faq'
+      };
+    }
+    
+    if (lowerInput.includes('hi') || lowerInput.includes('hello') || lowerInput.includes('hey')) {
+      const greetings = [
+        "Hey there! I'm Luis, nice to meet you. How can I help you today?",
+        "Hi! Great to connect. I'm Luis, a software developer and team manager. What brings you here?",
+        "Hello! I'm Luis. What can I help you with today?",
+        "Hey! Good to see you. I'm Luis - what's on your mind?",
+        "Hi there! I'm Luis, ready to chat. What can I do for you?"
+      ];
+      return {
+        tag: 'luis.direct_answer',
+        confidence: 0.9,
+        response: greetings[Math.floor(Math.random() * greetings.length)],
+        relevance,
+        source: 'faq'
+      };
+    }
+    
+    // For other relevant topics, return null to let OpenAI handle with Luis context
+    console.log(`🤖 Relevant but no direct match, letting OpenAI handle with Luis context: "${userInput}"`);
+    return null;
   }
 
   /**
@@ -343,5 +637,42 @@ export class TensorFlowService {
       console.warn('Error loading learning examples:', error);
     }
     return [];
+  }
+
+  /**
+   * Get model performance statistics
+   */
+  getModelStats(): {
+    isReady: boolean;
+    vocabularySize: number;
+    intentCount: number;
+    learnedExamples: number;
+    confidenceThreshold: number;
+    relevanceThreshold: number;
+  } {
+    return {
+      isReady: this.model !== null,
+      vocabularySize: this.vocabulary.length,
+      intentCount: this.intents.length,
+      learnedExamples: this.getLearningExamples().length,
+      confidenceThreshold: this.confidenceThreshold,
+      relevanceThreshold: this.relevanceThreshold,
+    };
+  }
+
+  /**
+   * Update confidence threshold dynamically
+   */
+  updateConfidenceThreshold(newThreshold: number): void {
+    this.confidenceThreshold = Math.max(0.1, Math.min(1.0, newThreshold));
+    console.log(`🎯 Confidence threshold updated to: ${this.confidenceThreshold}`);
+  }
+
+  /**
+   * Update relevance threshold dynamically
+   */
+  updateRelevanceThreshold(newThreshold: number): void {
+    this.relevanceThreshold = Math.max(0.1, Math.min(1.0, newThreshold));
+    console.log(`🎯 Relevance threshold updated to: ${this.relevanceThreshold}`);
   }
 }
