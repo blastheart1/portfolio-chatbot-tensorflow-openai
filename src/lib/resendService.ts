@@ -62,9 +62,7 @@ export class ResendService {
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2 style="color: #0056b3;">Hello ${leadData.name},</h2>
-        <p>Thank you for reaching out to Luis through his portfolio chatbot! He has received your inquiry regarding a <strong>${leadData.projectType}</strong> project.</p>
-        <p>Luis is a Senior IBM ODM Specialist (BRMS) and QA Team Manager, as well as a Full-Stack Developer who leverages AI, machine learning, and generative technologies to elevate business processes. He's excited to learn more about your project!</p>
-        <p>He will review your details and get back to you within <strong>24-48 hours</strong> to discuss your needs further.</p>
+        <p>Thank you for your inquiry. I've received your message and will carefully review your project needs. My goal is to ensure you get the right solution, and I'll be in touch shortly with more details on how we can move forward.</p>
         <p>In the meantime, feel free to explore his portfolio: <a href="https://my-portfolio-jusu.vercel.app/" style="color: #0056b3; text-decoration: none;">my-portfolio-jusu.vercel.app</a></p>
         <p>Best regards,<br/>Luis Santos</p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">

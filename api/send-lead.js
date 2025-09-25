@@ -283,7 +283,7 @@ export default async function handler(req, res) {
       const leadNotificationResult = await resend.emails.send({
         from: `Luis.dev <${fromEmail}>`,
         to: [toEmail],
-        subject: `🎯 New ${priority} Lead! ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project - ${leadData.name}`,
+        subject: `📋 ${priority} Priority Lead: ${leadData.name} wants ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} services`,
         html: generateLeadNotificationHtml(leadData, priority),
       });
 

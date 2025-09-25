@@ -167,7 +167,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
                     <span className="text-white text-sm">✓</span>
                   </div>
                   <p className="text-green-800 font-medium">
-                    Thank you! I'll reach out within 24 hours with a detailed proposal.
+                    Thank you for your inquiry. I've received your message and will carefully review your project needs. My goal is to ensure you get the right solution, and I'll be in touch shortly with more details on how we can move forward.
                   </p>
                 </div>
               </motion.div>
