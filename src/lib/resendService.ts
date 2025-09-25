@@ -18,18 +18,18 @@ export interface ResendConfig {
 }
 
 export class ResendService {
-  private resend: Resend;
+  private resend?: Resend;
   private config: ResendConfig;
 
   constructor(config: ResendConfig) {
     this.config = config;
     
-    // Check if API key is configured
-    if (!this.config.apiKey || this.config.apiKey.trim() === '') {
-      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
+    // Only initialize Resend if API key is configured
+    if (this.config.apiKey && this.config.apiKey.trim() !== '') {
+      this.resend = new Resend(this.config.apiKey);
+    } else {
+      console.warn('⚠️ Resend API key not configured. Lead generation will not work until REACT_APP_RESEND_API_KEY is set.');
     }
-    
-    this.resend = new Resend(this.config.apiKey);
   }
 
   /**
@@ -96,6 +96,11 @@ export class ResendService {
    * Send lead notification email to Luis
    */
   async sendLeadNotification(leadData: LeadData): Promise<void> {
+    // Check if Resend is initialized
+    if (!this.resend) {
+      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
+    }
+
     try {
       const priority = this.getLeadPriority(leadData);
       const htmlContent = this.generateLeadNotificationHtml(leadData, priority);
@@ -123,6 +128,11 @@ export class ResendService {
    * Send welcome email to the lead
    */
   async sendWelcomeEmail(leadData: LeadData): Promise<void> {
+    // Check if Resend is initialized
+    if (!this.resend) {
+      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
+    }
+
     try {
       const htmlContent = this.generateWelcomeEmailHtml(leadData);
 
