@@ -40,8 +40,8 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     console.log('🔍 Environment check:');
     console.log('  - openaiApiKey prop:', openaiApiKey ? 'provided' : 'not provided');
     console.log('  - REACT_APP_OPENAI_API_KEY:', process.env.REACT_APP_OPENAI_API_KEY ? 'found' : 'not found');
-    console.log('  - Final apiKey length:', apiKey.length);
-    console.log('  - Final apiKey starts with:', apiKey.substring(0, 10));
+    console.log('  - Final apiKey length:', apiKey ? '***' : '0');
+    console.log('  - Final apiKey status:', apiKey ? 'configured' : 'missing');
     
     if (apiKey && apiKey.length > 20) {
       console.log('✅ OpenAI API key loaded successfully');

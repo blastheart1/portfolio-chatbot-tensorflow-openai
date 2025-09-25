@@ -182,8 +182,8 @@ export class OpenAIService {
         "You are a helpful AI assistant. Provide concise, helpful responses. " +
         "If you don't know something, say so politely.";
 
-      console.log('🔍 OpenAI API Key (first 10 chars):', this.config.apiKey.substring(0, 10));
-      console.log('🔍 API Key length:', this.config.apiKey.length);
+      console.log('🔍 OpenAI API Key status:', this.config.apiKey ? 'configured' : 'missing');
+      console.log('🔍 API Key length:', this.config.apiKey ? '***' : '0');
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',

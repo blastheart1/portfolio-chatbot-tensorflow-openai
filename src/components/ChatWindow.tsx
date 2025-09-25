@@ -57,8 +57,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   useEffect(() => {
     console.log('🔍 Lead Generation Environment Check:');
     console.log('  - REACT_APP_RESEND_API_KEY:', process.env.REACT_APP_RESEND_API_KEY ? 'configured' : 'missing');
-    console.log('  - REACT_APP_FROM_EMAIL:', process.env.REACT_APP_FROM_EMAIL || 'not set');
-    console.log('  - REACT_APP_TO_EMAIL:', process.env.REACT_APP_TO_EMAIL || 'not set');
+    console.log('  - REACT_APP_FROM_EMAIL:', process.env.REACT_APP_FROM_EMAIL ? 'configured' : 'not set');
+    console.log('  - REACT_APP_TO_EMAIL:', process.env.REACT_APP_TO_EMAIL ? 'configured' : 'not set');
   }, []);
   
   const resendService = useRef(new ResendService({
