@@ -55,44 +55,217 @@ export default async function handler(req, res) {
 
     // Generate HTML for lead notification
     const generateLeadNotificationHtml = (leadData, priority) => {
+      const priorityColors = {
+        'HIGH': '#dc3545',
+        'MEDIUM': '#ffc107', 
+        'STANDARD': '#28a745'
+      };
+      const priorityBgColors = {
+        'HIGH': '#fff5f5',
+        'MEDIUM': '#fffbf0',
+        'STANDARD': '#f8fff8'
+      };
+
       return `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #0056b3;">🎯 New Lead: ${leadData.name} - ${leadData.projectType} Project</h2>
-          <p>You have received a new lead from your portfolio chatbot!</p>
-          <p><strong>Priority:</strong> <span style="color: ${priority === 'HIGH' ? '#dc3545' : priority === 'MEDIUM' ? '#ffc107' : '#28a745'}; font-weight: bold;">${priority}</span></p>
-          <h3 style="color: #0056b3;">Lead Details:</h3>
-          <ul>
-            <li><strong>Name:</strong> ${leadData.name}</li>
-            <li><strong>Email:</strong> <a href="mailto:${leadData.email}">${leadData.email}</a></li>
-            ${leadData.phone ? `<li><strong>Phone:</strong> ${leadData.phone}</li>` : ''}
-            ${leadData.company ? `<li><strong>Company:</strong> ${leadData.company}</li>` : ''}
-            <li><strong>Project Type:</strong> ${leadData.projectType}</li>
-            <li><strong>Budget:</strong> ${leadData.budget}</li>
-            <li><strong>Timeline:</strong> ${leadData.timeline}</li>
-          </ul>
-          <h3 style="color: #0056b3;">Project Description:</h3>
-          <p>${leadData.description}</p>
-          <p>Please reach out to the lead as soon as possible!</p>
-          <p>Best regards,<br/>Your Portfolio Chatbot</p>
-          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 0.8em; color: #777;">This email was sent automatically by your lead generation system.</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New ${priority} Lead - ${leadData.projectType} Project</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px 24px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
+                🎯 New ${priority} Lead!
+              </h1>
+              <p style="margin: 8px 0 0 0; color: #e2e8f0; font-size: 16px;">
+                ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project Inquiry
+              </p>
+            </div>
+
+            <!-- Priority Badge -->
+            <div style="padding: 20px 24px; text-align: center; background-color: ${priorityBgColors[priority]}; border-bottom: 1px solid #e2e8f0;">
+              <span style="display: inline-block; padding: 8px 16px; background-color: ${priorityColors[priority]}; color: #ffffff; border-radius: 20px; font-weight: 600; font-size: 14px; text-transform: uppercase;">
+                ${priority} Priority
+              </span>
+            </div>
+
+            <!-- Lead Details Card -->
+            <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+              <h2 style="margin: 0 0 20px 0; color: #1a202c; font-size: 20px; font-weight: 600;">
+                📋 Lead Information
+              </h2>
+              
+              <div style="display: grid; gap: 16px;">
+                <div style="display: flex; align-items: center; padding: 12px; background-color: #f7fafc; border-radius: 8px; border-left: 4px solid #667eea;">
+                  <span style="font-weight: 600; color: #4a5568; min-width: 80px;">👤 Name:</span>
+                  <span style="color: #2d3748; font-weight: 500;">${leadData.name}</span>
+                </div>
+                
+                <div style="display: flex; align-items: center; padding: 12px; background-color: #f7fafc; border-radius: 8px; border-left: 4px solid #48bb78;">
+                  <span style="font-weight: 600; color: #4a5568; min-width: 80px;">📧 Email:</span>
+                  <a href="mailto:${leadData.email}" style="color: #667eea; text-decoration: none; font-weight: 500;">${leadData.email}</a>
+                </div>
+                
+                ${leadData.phone ? `
+                <div style="display: flex; align-items: center; padding: 12px; background-color: #f7fafc; border-radius: 8px; border-left: 4px solid #ed8936;">
+                  <span style="font-weight: 600; color: #4a5568; min-width: 80px;">📱 Phone:</span>
+                  <a href="tel:${leadData.phone}" style="color: #667eea; text-decoration: none; font-weight: 500;">${leadData.phone}</a>
+                </div>
+                ` : ''}
+                
+                ${leadData.company ? `
+                <div style="display: flex; align-items: center; padding: 12px; background-color: #f7fafc; border-radius: 8px; border-left: 4px solid #9f7aea;">
+                  <span style="font-weight: 600; color: #4a5568; min-width: 80px;">🏢 Company:</span>
+                  <span style="color: #2d3748; font-weight: 500;">${leadData.company}</span>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Project Details Card -->
+            <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+              <h2 style="margin: 0 0 20px 0; color: #1a202c; font-size: 20px; font-weight: 600;">
+                🚀 Project Details
+              </h2>
+              
+              <div style="display: grid; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 12px 16px; background-color: #f7fafc; border-radius: 8px;">
+                  <span style="font-weight: 600; color: #4a5568;">Project Type:</span>
+                  <span style="color: #2d3748; font-weight: 500; text-transform: capitalize;">${leadData.projectType.replace('fullstack', 'Full-Stack')}</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; padding: 12px 16px; background-color: #f7fafc; border-radius: 8px;">
+                  <span style="font-weight: 600; color: #4a5568;">Budget:</span>
+                  <span style="color: #2d3748; font-weight: 500; text-transform: capitalize;">${leadData.budget}</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; padding: 12px 16px; background-color: #f7fafc; border-radius: 8px;">
+                  <span style="font-weight: 600; color: #4a5568;">Timeline:</span>
+                  <span style="color: #2d3748; font-weight: 500; text-transform: capitalize;">${leadData.timeline.replace('asap', 'ASAP').replace('1-3months', '1-3 Months').replace('3-6months', '3-6 Months')}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description Card -->
+            <div style="padding: 24px;">
+              <h2 style="margin: 0 0 16px 0; color: #1a202c; font-size: 20px; font-weight: 600;">
+                💬 Project Description
+              </h2>
+              <div style="padding: 16px; background-color: #f7fafc; border-radius: 8px; border-left: 4px solid #667eea;">
+                <p style="margin: 0; color: #4a5568; line-height: 1.6; white-space: pre-wrap;">${leadData.description}</p>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <div style="padding: 0 24px 24px 24px; text-align: center;">
+              <a href="mailto:${leadData.email}?subject=Re: ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project Inquiry&body=Hi ${leadData.name},%0D%0A%0D%0AThank you for your interest in my ${leadData.projectType} services. I'd love to discuss your project in more detail.%0D%0A%0D%0ABest regards,%0D%0ALuis" 
+                 style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                📧 Reply to Lead
+              </a>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding: 20px 24px; background-color: #f7fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0; color: #718096; font-size: 14px;">
+                🤖 Sent automatically by your portfolio chatbot
+              </p>
+              <p style="margin: 8px 0 0 0; color: #a0aec0; font-size: 12px;">
+                Lead generated on ${new Date().toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
       `;
     };
 
     // Generate HTML for welcome email
     const generateWelcomeEmailHtml = (leadData) => {
       return `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <h2 style="color: #0056b3;">Hello ${leadData.name},</h2>
-          <p>Thank you for reaching out to Luis through his portfolio chatbot! He has received your inquiry regarding a <strong>${leadData.projectType}</strong> project.</p>
-          <p>Luis is a Senior IBM ODM Specialist (BRMS) and QA Team Manager, as well as a Full-Stack Developer who leverages AI, machine learning, and generative technologies to elevate business processes. He's excited to learn more about your project!</p>
-          <p>He will review your details and get back to you within <strong>24-48 hours</strong> to discuss your needs further.</p>
-          <p>In the meantime, feel free to explore his portfolio: <a href="https://my-portfolio-jusu.vercel.app/" style="color: #0056b3; text-decoration: none;">my-portfolio-jusu.vercel.app</a></p>
-          <p>Best regards,<br/>Luis Santos</p>
-          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 0.8em; color: #777;">This email was sent automatically. Please do not reply to this address.</p>
-        </div>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Thank you for your inquiry - Luis Santos</title>
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px 24px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
+                👋 Hello ${leadData.name}!
+              </h1>
+              <p style="margin: 8px 0 0 0; color: #e2e8f0; font-size: 16px;">
+                Thank you for reaching out
+              </p>
+            </div>
+
+            <!-- Main Content -->
+            <div style="padding: 32px 24px;">
+              <div style="background-color: #f7fafc; padding: 24px; border-radius: 12px; border-left: 4px solid #667eea; margin-bottom: 24px;">
+                <h2 style="margin: 0 0 16px 0; color: #1a202c; font-size: 20px; font-weight: 600;">
+                  ✅ Your ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project Inquiry
+                </h2>
+                <p style="margin: 0; color: #4a5568; line-height: 1.6;">
+                  I've received your inquiry and I'm excited to learn more about your project! 
+                  As a Senior IBM ODM Specialist (BRMS) and QA Team Manager, I specialize in 
+                  <strong>Full-Stack Development</strong> and leveraging <strong>AI, machine learning, 
+                  and generative technologies</strong> to elevate business processes.
+                </p>
+              </div>
+
+              <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 16px 0; color: #1a202c; font-size: 18px; font-weight: 600;">
+                  ⏰ What's Next?
+                </h3>
+                <div style="background-color: #fffbf0; padding: 16px; border-radius: 8px; border-left: 4px solid #ffc107;">
+                  <p style="margin: 0; color: #744210; font-weight: 500;">
+                    I'll review your project details and get back to you within 
+                    <strong>24-48 hours</strong> to discuss your needs in more detail.
+                  </p>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 16px 0; color: #1a202c; font-size: 18px; font-weight: 600;">
+                  🔗 Explore My Work
+                </h3>
+                <div style="text-align: center;">
+                  <a href="https://my-portfolio-jusu.vercel.app/" 
+                     style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    🚀 View My Portfolio
+                  </a>
+                </div>
+              </div>
+
+              <div style="background-color: #f7fafc; padding: 20px; border-radius: 8px; text-align: center;">
+                <p style="margin: 0; color: #4a5568; font-size: 16px; line-height: 1.6;">
+                  <strong>Best regards,</strong><br/>
+                  <span style="color: #667eea; font-weight: 600; font-size: 18px;">Luis Santos</span><br/>
+                  <span style="color: #718096; font-size: 14px;">Senior IBM ODM Specialist & Full-Stack Developer</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding: 20px 24px; background-color: #f7fafc; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0; color: #718096; font-size: 14px;">
+                📧 This email was sent automatically from my portfolio chatbot
+              </p>
+              <p style="margin: 8px 0 0 0; color: #a0aec0; font-size: 12px;">
+                Reply directly to this email to reach me
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
       `;
     };
 
@@ -107,23 +280,23 @@ export default async function handler(req, res) {
 
     // Send lead notification email to Luis
     console.log('📤 Sending lead notification email...');
-    const leadNotificationResult = await resend.emails.send({
-      from: fromEmail,
-      to: [toEmail],
-      subject: `🎯 New Lead: ${leadData.name} - ${leadData.projectType} Project (Priority: ${priority})`,
-      html: generateLeadNotificationHtml(leadData, priority),
-    });
+      const leadNotificationResult = await resend.emails.send({
+        from: `Luis.dev <${fromEmail}>`,
+        to: [toEmail],
+        subject: `🎯 New ${priority} Lead! ${leadData.projectType.charAt(0).toUpperCase() + leadData.projectType.slice(1)} Project - ${leadData.name}`,
+        html: generateLeadNotificationHtml(leadData, priority),
+      });
 
     console.log('📤 Lead notification result:', leadNotificationResult);
 
     // Send welcome email to the lead
     console.log('📤 Sending welcome email...');
-    const welcomeEmailResult = await resend.emails.send({
-      from: fromEmail,
-      to: [leadData.email],
-      subject: `Thanks for your inquiry, ${leadData.name}!`,
-      html: generateWelcomeEmailHtml(leadData),
-    });
+      const welcomeEmailResult = await resend.emails.send({
+        from: `Luis.dev <${fromEmail}>`,
+        to: [leadData.email],
+        subject: `👋 Thanks for your inquiry, ${leadData.name}! - Luis Santos`,
+        html: generateWelcomeEmailHtml(leadData),
+      });
 
     console.log('📤 Welcome email result:', welcomeEmailResult);
 
