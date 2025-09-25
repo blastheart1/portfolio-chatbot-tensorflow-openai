@@ -5,6 +5,11 @@
   "installCommand": "npm install",
   "framework": "create-react-app",
   "public": true,
+  "functions": {
+    "api/send-lead.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "headers": [
     {
       "source": "/static/(.*)",
@@ -18,7 +23,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!LuisBot\\.png|LuisBot\\.ico|code-light\\.ico|code-dark\\.ico|manifest\\.json|.*\\.(?:png|jpg|jpeg|gif|svg|ico|json|webp)).*)",
+      "source": "/((?!api|LuisBot\\.png|LuisBot\\.ico|code-light\\.ico|code-dark\\.ico|manifest\\.json|.*\\.(?:png|jpg|jpeg|gif|svg|ico|json|webp)).*)",
       "destination": "/index.html"
     }
   ]

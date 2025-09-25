@@ -1,5 +1,3 @@
-import { Resend } from 'resend';
-
 export interface LeadData {
   name: string;
   email: string;
@@ -18,16 +16,12 @@ export interface ResendConfig {
 }
 
 export class ResendService {
-  private resend?: Resend;
   private config: ResendConfig;
 
   constructor(config: ResendConfig) {
     this.config = config;
     
-    // Only initialize Resend if API key is configured
-    if (this.config.apiKey && this.config.apiKey.trim() !== '') {
-      this.resend = new Resend(this.config.apiKey);
-    } else {
+    if (!this.config.apiKey || this.config.apiKey.trim() === '') {
       console.warn('⚠️ Resend API key not configured. Lead generation will not work until REACT_APP_RESEND_API_KEY is set.');
     }
   }
@@ -96,28 +90,30 @@ export class ResendService {
    * Send lead notification email to Luis
    */
   async sendLeadNotification(leadData: LeadData): Promise<void> {
-    // Check if Resend is initialized
-    if (!this.resend) {
+    // Check if API key is configured
+    if (!this.config.apiKey || this.config.apiKey.trim() === '') {
       throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
     }
 
     try {
-      const priority = this.getLeadPriority(leadData);
-      const htmlContent = this.generateLeadNotificationHtml(leadData, priority);
-
-      const { data, error } = await this.resend.emails.send({
-        from: this.config.fromEmail,
-        to: [this.config.toEmail],
-        subject: `🎯 New Lead: ${leadData.name} - ${leadData.projectType} Project (Priority: ${priority})`,
-        html: htmlContent,
+      const response = await fetch('/api/send-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          leadData: leadData
+        }),
       });
 
-      if (error) {
-        console.error('Resend API Error (Lead Notification):', error);
-        throw new Error(`Failed to send lead notification: ${error.message}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('API Error:', result);
+        throw new Error(result.error || 'Failed to send lead notification');
       }
 
-      console.log('✅ Lead notification email sent successfully:', data);
+      console.log('✅ Lead notification email sent successfully:', result);
     } catch (error) {
       console.error('Error sending lead notification email:', error);
       throw error;
@@ -128,30 +124,8 @@ export class ResendService {
    * Send welcome email to the lead
    */
   async sendWelcomeEmail(leadData: LeadData): Promise<void> {
-    // Check if Resend is initialized
-    if (!this.resend) {
-      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
-    }
-
-    try {
-      const htmlContent = this.generateWelcomeEmailHtml(leadData);
-
-      const { data, error } = await this.resend.emails.send({
-        from: this.config.fromEmail,
-        to: [leadData.email],
-        subject: `Thanks for your inquiry, ${leadData.name}!`,
-        html: htmlContent,
-      });
-
-      if (error) {
-        console.error('Resend API Error (Welcome Email):', error);
-        throw new Error(`Failed to send welcome email: ${error.message}`);
-      }
-
-      console.log('✅ Welcome email sent successfully to lead:', data);
-    } catch (error) {
-      console.error('Error sending welcome email:', error);
-      throw error;
-    }
+    // This is now handled by the API endpoint along with the lead notification
+    // The /api/send-lead endpoint sends both emails
+    console.log('✅ Welcome email will be sent via API endpoint');
   }
 }
