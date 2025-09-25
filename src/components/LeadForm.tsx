@@ -64,7 +64,14 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       }, 2000);
     } catch (error) {
       console.error('Lead form submission error:', error);
-      setSubmitStatus('error');
+      
+      // Show specific error message based on error type
+      if (error instanceof Error && error.message.includes('API key')) {
+        setSubmitStatus('error');
+        // You could add a more specific error state here
+      } else {
+        setSubmitStatus('error');
+      }
     } finally {
       setIsSubmitting(false);
     }

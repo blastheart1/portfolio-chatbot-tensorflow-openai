@@ -52,10 +52,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   // Initialize lead generation services
   const leadDetectionService = useRef(new LeadDetectionService());
+  
+  // Debug environment variables
+  useEffect(() => {
+    console.log('🔍 Lead Generation Environment Check:');
+    console.log('  - REACT_APP_RESEND_API_KEY:', process.env.REACT_APP_RESEND_API_KEY ? 'configured' : 'missing');
+    console.log('  - REACT_APP_FROM_EMAIL:', process.env.REACT_APP_FROM_EMAIL || 'not set');
+    console.log('  - REACT_APP_TO_EMAIL:', process.env.REACT_APP_TO_EMAIL || 'not set');
+  }, []);
+  
   const resendService = useRef(new ResendService({
     apiKey: process.env.REACT_APP_RESEND_API_KEY || '',
-    fromEmail: process.env.REACT_APP_FROM_EMAIL || 'noreply@yourdomain.com',
-    toEmail: process.env.REACT_APP_TO_EMAIL || 'your-email@example.com'
+    fromEmail: process.env.REACT_APP_FROM_EMAIL || 'onboarding@resend.dev',
+    toEmail: process.env.REACT_APP_TO_EMAIL || 'antonioluis.santos1@gmail.com'
   }));
 
   // Generate unique IDs to prevent duplicate keys

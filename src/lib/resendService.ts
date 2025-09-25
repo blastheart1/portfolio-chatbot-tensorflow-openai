@@ -26,6 +26,11 @@ export class ResendService {
    * Send lead notification email to Luis
    */
   async sendLeadNotification(leadData: LeadData): Promise<void> {
+    // Check if API key is configured
+    if (!this.config.apiKey || this.config.apiKey.trim() === '') {
+      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
+    }
+
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -59,6 +64,11 @@ export class ResendService {
    * Send welcome email to the lead
    */
   async sendWelcomeEmail(leadData: LeadData): Promise<void> {
+    // Check if API key is configured
+    if (!this.config.apiKey || this.config.apiKey.trim() === '') {
+      throw new Error('Resend API key is not configured. Please add REACT_APP_RESEND_API_KEY to your environment variables.');
+    }
+
     try {
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
