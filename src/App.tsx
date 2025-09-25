@@ -52,75 +52,153 @@ function App() {
               About This Demo
             </h2>
             <p className="text-gray-600 mb-6">
-              This chatbot showcases Luis's AI expertise with a hybrid architecture combining TensorFlow.js 
-              for local intent classification and OpenAI for complex queries. The system uses relevance scoring, 
-              content filtering, and lead generation to demonstrate advanced AI implementation skills while 
-              maintaining professional boundaries and user experience.
+              This chatbot showcases Luis's AI expertise with a smart two-tier system: a local AI brain that runs 
+              in your browser for fast responses, and OpenAI's advanced language model for complex questions. 
+              It intelligently filters content, generates qualified leads, and learns from conversations while 
+              maintaining professional boundaries.
             </p>
             
             <div className="grid md:grid-cols-2 gap-6 text-left">
               <div className="bg-blue-50 p-6 rounded-xl">
                 <h3 className="text-lg font-semibold text-blue-800 mb-3">
-                  🤖 TensorFlow.js (Primary Intelligence)
+                  🤖 TensorFlow.js (Local AI Brain)
                 </h3>
-                <ul className="text-blue-700 space-y-2">
-                  <li>• <strong>Multi-layer Neural Network:</strong> 256→128→64→numIntents architecture</li>
-                  <li>• <strong>Bag-of-Words Tokenization:</strong> Custom vocabulary with 1000+ terms</li>
-                  <li>• <strong>Relevance Scoring:</strong> Keyword-based content filtering (threshold: 0.4)</li>
-                  <li>• <strong>Confidence Thresholding:</strong> Dynamic confidence scoring (threshold: 0.6)</li>
-                  <li>• <strong>Model Persistence:</strong> IndexedDB storage with automatic retraining</li>
-                  <li>• <strong>Content Filtering:</strong> Profanity detection (English + Filipino)</li>
-                  <li>• <strong>Lead Generation:</strong> AI-powered opportunity detection</li>
-                </ul>
+                <div className="text-blue-700 space-y-3">
+                  <div>
+                    <strong>🧠 Smart Neural Network:</strong> 4-layer brain (256→128→64→answers)
+                    <div className="text-sm text-blue-600 mt-1">Like having a mini-AI that runs instantly in your browser</div>
+                  </div>
+                  <div>
+                    <strong>📚 Custom Knowledge Base:</strong> 1000+ Luis-specific terms and phrases
+                    <div className="text-sm text-blue-600 mt-1">Trained specifically on Luis's expertise and services</div>
+                  </div>
+                  <div>
+                    <strong>🎯 Relevance Scoring:</strong> Smart filtering (40% relevance threshold)
+                    <div className="text-sm text-blue-600 mt-1">Only responds to topics actually related to Luis's work</div>
+                  </div>
+                  <div>
+                    <strong>⚡ Confidence System:</strong> Dynamic accuracy checking (60% confidence threshold)
+                    <div className="text-sm text-blue-600 mt-1">Only gives answers when it's really sure it's right</div>
+                  </div>
+                  <div>
+                    <strong>💾 Memory System:</strong> IndexedDB storage with auto-learning
+                    <div className="text-sm text-blue-600 mt-1">Remembers new conversations and gets smarter over time</div>
+                  </div>
+                  <div>
+                    <strong>🛡️ Content Safety:</strong> Profanity & inappropriate content detection
+                    <div className="text-sm text-blue-600 mt-1">Keeps conversations professional and respectful</div>
+                  </div>
+                  <div>
+                    <strong>🎯 Lead Detection:</strong> AI-powered opportunity recognition
+                    <div className="text-sm text-blue-600 mt-1">Automatically spots when someone might want to work with Luis</div>
+                  </div>
+                </div>
               </div>
               
               <div className="bg-purple-50 p-6 rounded-xl">
                 <h3 className="text-lg font-semibold text-purple-800 mb-3">
-                  🧠 OpenAI Integration (Last Resort Only)
+                  🧠 OpenAI Integration (Advanced Fallback)
                 </h3>
-                <ul className="text-purple-700 space-y-2">
-                  <li>• <strong>GPT-3.5-turbo:</strong> 150 token limit with Luis context</li>
-                  <li>• <strong>Prompt Engineering:</strong> Structured context with examples</li>
-                  <li>• <strong>Markdown Formatting:</strong> Bold, bullets, hyperlinks in responses</li>
-                  <li>• <strong>Content Filtering:</strong> Pre-API inappropriate content detection</li>
-                  <li>• <strong>Fallback Logic:</strong> Only for relevant Luis questions</li>
-                  <li>• <strong>Cost Optimization:</strong> Zero tokens for filtered content</li>
-                  <li>• <strong>Error Handling:</strong> Graceful degradation to FAQ responses</li>
-                </ul>
+                <div className="text-purple-700 space-y-3">
+                  <div>
+                    <strong>🚀 GPT-3.5-turbo:</strong> 150 token responses with Luis context
+                    <div className="text-sm text-purple-600 mt-1">Only for complex questions when the local AI needs help</div>
+                  </div>
+                  <div>
+                    <strong>📝 Smart Prompting:</strong> Structured context with examples
+                    <div className="text-sm text-purple-600 mt-1">Gives OpenAI the right information to answer like Luis would</div>
+                  </div>
+                  <div>
+                    <strong>✨ Rich Formatting:</strong> Bold text, bullets, hyperlinks
+                    <div className="text-sm text-purple-600 mt-1">Makes responses look professional and easy to read</div>
+                  </div>
+                  <div>
+                    <strong>🔒 Pre-filtering:</strong> Content safety before API calls
+                    <div className="text-sm text-purple-600 mt-1">Blocks inappropriate content before wasting API credits</div>
+                  </div>
+                  <div>
+                    <strong>🎯 Smart Fallback:</strong> Only for relevant Luis questions
+                    <div className="text-sm text-purple-600 mt-1">Won't answer random questions - stays focused on Luis's expertise</div>
+                  </div>
+                  <div>
+                    <strong>💰 Cost Optimization:</strong> Zero tokens for filtered content
+                    <div className="text-sm text-purple-600 mt-1">Saves money by not sending inappropriate requests to OpenAI</div>
+                  </div>
+                  <div>
+                    <strong>🛠️ Error Handling:</strong> Graceful fallback to FAQ responses
+                    <div className="text-sm text-purple-600 mt-1">Always provides a helpful answer, even when things go wrong</div>
+                  </div>
+                </div>
               </div>
             </div>
             
             <div className="mt-6 bg-gray-50 p-6 rounded-xl">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                🔧 Technical Architecture & Features
+                🔧 How It All Works Together
               </h3>
               <div className="grid md:grid-cols-3 gap-4 text-sm">
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">AI/ML Pipeline</h4>
-                  <ul className="text-gray-600 space-y-1">
-                    <li>• Intent Classification (TensorFlow.js)</li>
-                    <li>• Semantic Relevance Scoring</li>
-                    <li>• Dynamic Confidence Thresholding</li>
-                    <li>• Automated Model Retraining</li>
-                  </ul>
+                  <h4 className="font-semibold text-gray-700 mb-2">🧠 AI/ML Pipeline</h4>
+                  <div className="text-gray-600 space-y-2">
+                    <div>
+                      <strong>Intent Classification:</strong> Understands what you're asking
+                      <div className="text-xs text-gray-500 mt-1">Like a smart translator that knows Luis's business</div>
+                    </div>
+                    <div>
+                      <strong>Relevance Scoring:</strong> Checks if it's related to Luis's work
+                      <div className="text-xs text-gray-500 mt-1">Won't waste time on random topics</div>
+                    </div>
+                    <div>
+                      <strong>Confidence Checking:</strong> Only answers when it's sure
+                      <div className="text-xs text-gray-500 mt-1">Prefers to ask for help rather than guess wrong</div>
+                    </div>
+                    <div>
+                      <strong>Auto-Learning:</strong> Gets smarter from conversations
+                      <div className="text-xs text-gray-500 mt-1">Each chat makes it better for the next person</div>
+                    </div>
+                  </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Lead Generation</h4>
-                  <ul className="text-gray-600 space-y-1">
-                    <li>• AI-Powered Opportunity Detection</li>
-                    <li>• Natural Conversation Flow</li>
-                    <li>• Resend API Integration</li>
-                    <li>• Priority Scoring System</li>
-                  </ul>
+                  <h4 className="font-semibold text-gray-700 mb-2">🎯 Lead Generation</h4>
+                  <div className="text-gray-600 space-y-2">
+                    <div>
+                      <strong>Smart Detection:</strong> Spots potential clients automatically
+                      <div className="text-xs text-gray-500 mt-1">Knows when someone's interested in Luis's services</div>
+                    </div>
+                    <div>
+                      <strong>Natural Flow:</strong> Asks politely before collecting info
+                      <div className="text-xs text-gray-500 mt-1">No pushy forms - just helpful conversation</div>
+                    </div>
+                    <div>
+                      <strong>Email Automation:</strong> Sends notifications instantly
+                      <div className="text-xs text-gray-500 mt-1">Luis gets notified immediately when someone's interested</div>
+                    </div>
+                    <div>
+                      <strong>Priority Scoring:</strong> Ranks leads by importance
+                      <div className="text-xs text-gray-500 mt-1">High-budget, urgent projects get flagged first</div>
+                    </div>
+                  </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">User Experience</h4>
-                  <ul className="text-gray-600 space-y-1">
-                    <li>• Clickable Quick Suggestions</li>
-                    <li>• Content Filtering & Safety</li>
-                    <li>• Mobile-Responsive Design</li>
-                    <li>• Real-time Typing Indicators</li>
-                  </ul>
+                  <h4 className="font-semibold text-gray-700 mb-2">✨ User Experience</h4>
+                  <div className="text-gray-600 space-y-2">
+                    <div>
+                      <strong>Quick Start:</strong> Clickable suggestion buttons
+                      <div className="text-xs text-gray-500 mt-1">No need to think of questions - just click and go</div>
+                    </div>
+                    <div>
+                      <strong>Safety First:</strong> Content filtering & safety
+                      <div className="text-xs text-gray-500 mt-1">Keeps conversations professional and respectful</div>
+                    </div>
+                    <div>
+                      <strong>Mobile Ready:</strong> Works on any device
+                      <div className="text-xs text-gray-500 mt-1">Looks great on phones, tablets, and computers</div>
+                    </div>
+                    <div>
+                      <strong>Live Feedback:</strong> Real-time typing indicators
+                      <div className="text-xs text-gray-500 mt-1">Shows the AI is thinking and working</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
