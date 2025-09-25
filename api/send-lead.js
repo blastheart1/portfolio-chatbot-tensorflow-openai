@@ -1,7 +1,12 @@
 const { Resend } = require('resend');
 
 export default async function handler(req, res) {
-  const resend = new Resend(process.env.REACT_APP_RESEND_API_KEY);
+  console.log('📧 Lead submission API called');
+  console.log('🔍 Environment check:');
+  console.log('  - REACT_APP_RESEND_API_KEY:', process.env.REACT_APP_RESEND_API_KEY ? 'SET' : 'NOT SET');
+  console.log('  - REACT_APP_FROM_EMAIL:', process.env.REACT_APP_FROM_EMAIL || 'NOT SET');
+  console.log('  - REACT_APP_TO_EMAIL:', process.env.REACT_APP_TO_EMAIL || 'NOT SET');
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,10 +15,13 @@ export default async function handler(req, res) {
   try {
     // Check if Resend API key is configured
     if (!process.env.REACT_APP_RESEND_API_KEY) {
+      console.error('❌ REACT_APP_RESEND_API_KEY not configured');
       return res.status(503).json({ 
         error: 'Email service not configured. Please add REACT_APP_RESEND_API_KEY to environment variables.' 
       });
     }
+
+    const resend = new Resend(process.env.REACT_APP_RESEND_API_KEY);
 
     const { leadData } = req.body;
 
@@ -91,7 +99,13 @@ export default async function handler(req, res) {
     const fromEmail = process.env.REACT_APP_FROM_EMAIL || 'onboarding@resend.dev';
     const toEmail = process.env.REACT_APP_TO_EMAIL || 'antonioluis.santos1@gmail.com';
 
+    console.log('📧 Sending emails:');
+    console.log('  - From:', fromEmail);
+    console.log('  - To Luis:', toEmail);
+    console.log('  - To Lead:', leadData.email);
+
     // Send lead notification email to Luis
+    console.log('📤 Sending lead notification email...');
     const leadNotificationResult = await resend.emails.send({
       from: fromEmail,
       to: [toEmail],
@@ -99,13 +113,28 @@ export default async function handler(req, res) {
       html: generateLeadNotificationHtml(leadData, priority),
     });
 
+    console.log('📤 Lead notification result:', leadNotificationResult);
+
     // Send welcome email to the lead
+    console.log('📤 Sending welcome email...');
     const welcomeEmailResult = await resend.emails.send({
       from: fromEmail,
       to: [leadData.email],
       subject: `Thanks for your inquiry, ${leadData.name}!`,
       html: generateWelcomeEmailHtml(leadData),
     });
+
+    console.log('📤 Welcome email result:', welcomeEmailResult);
+
+    if (leadNotificationResult.error) {
+      console.error('❌ Lead notification error:', leadNotificationResult.error);
+      throw new Error(`Lead notification failed: ${leadNotificationResult.error.message}`);
+    }
+
+    if (welcomeEmailResult.error) {
+      console.error('❌ Welcome email error:', welcomeEmailResult.error);
+      throw new Error(`Welcome email failed: ${welcomeEmailResult.error.message}`);
+    }
 
     console.log('✅ Lead notification email sent:', leadNotificationResult.data?.id);
     console.log('✅ Welcome email sent:', welcomeEmailResult.data?.id);
@@ -119,9 +148,11 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('❌ Lead submission error:', error);
+    console.error('❌ Error stack:', error.stack);
     return res.status(500).json({ 
       error: 'Failed to submit lead',
-      details: error.message
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 }
