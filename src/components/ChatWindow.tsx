@@ -585,6 +585,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          key="chat-window"
           initial={{ opacity: 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: isMobile ? 1 : 0.8, y: isMobile ? 0 : 20 }}

@@ -123,6 +123,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
   return (
     <AnimatePresence>
       <motion.div
+        key="lead-form"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
