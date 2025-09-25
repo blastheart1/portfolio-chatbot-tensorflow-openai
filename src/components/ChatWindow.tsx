@@ -63,7 +63,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   
   const resendService = useRef(new ResendService({
     apiKey: process.env.REACT_APP_RESEND_API_KEY || '',
-    fromEmail: process.env.REACT_APP_FROM_EMAIL || 'onboarding@resend.dev',
+    fromEmail: 'onboarding@resend.dev', // Always use verified Resend domain
     toEmail: process.env.REACT_APP_TO_EMAIL || 'antonioluis.santos1@gmail.com'
   }));
 

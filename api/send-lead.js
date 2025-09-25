@@ -4,8 +4,8 @@ export default async function handler(req, res) {
   console.log('📧 Lead submission API called');
   console.log('🔍 Environment check:');
   console.log('  - REACT_APP_RESEND_API_KEY:', process.env.REACT_APP_RESEND_API_KEY ? 'SET' : 'NOT SET');
-  console.log('  - REACT_APP_FROM_EMAIL:', process.env.REACT_APP_FROM_EMAIL || 'NOT SET');
   console.log('  - REACT_APP_TO_EMAIL:', process.env.REACT_APP_TO_EMAIL || 'NOT SET');
+  console.log('  - FROM_EMAIL (using verified Resend domain): onboarding@resend.dev');
 
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -96,7 +96,8 @@ export default async function handler(req, res) {
       `;
     };
 
-    const fromEmail = process.env.REACT_APP_FROM_EMAIL || 'onboarding@resend.dev';
+    // Use verified Resend domain for from email
+    const fromEmail = 'onboarding@resend.dev'; // Always use verified Resend domain
     const toEmail = process.env.REACT_APP_TO_EMAIL || 'antonioluis.santos1@gmail.com';
 
     console.log('📧 Sending emails:');
