@@ -48,6 +48,69 @@ export class OpenAIService {
   }
 
   /**
+   * Detect if text is in a non-English language
+   */
+  private detectNonEnglishLanguage(text: string): boolean {
+    const lowerText = text.toLowerCase().trim();
+    
+    // Common non-English patterns (Tagalog, Spanish, etc.)
+    const nonEnglishPatterns = [
+      // Tagalog/Filipino
+      'ano', 'saan', 'paano', 'bakit', 'sino', 'kailan', 'alin', 'gaano',
+      'ang', 'ng', 'sa', 'ay', 'na', 'pa', 'din', 'rin', 'lang', 'naman',
+      'talaga', 'ba', 'po', 'ho', 'opo', 'hindi', 'oo', 'salamat', 'magandang',
+      'umaga', 'hapon', 'gabi', 'kumusta', 'kamusta', 'mahal', 'mahal kita',
+      
+      // Spanish
+      'hola', 'como', 'estas', 'que', 'donde', 'cuando', 'porque', 'quien',
+      'buenos', 'dias', 'tardes', 'noches', 'gracias', 'por favor', 'si', 'no',
+      
+      // Other common non-English words
+      'bonjour', 'merci', 'guten', 'tag', 'ciao', 'grazie', 'konnichiwa',
+      'arigato', 'namaste', 'shalom', 'privet', 'hallo', 'hej'
+    ];
+    
+    // Check for non-English words
+    const hasNonEnglishWords = nonEnglishPatterns.some(word => 
+      lowerText.includes(word)
+    );
+    
+    // Check for non-Latin characters (Cyrillic, Arabic, Chinese, etc.)
+    // eslint-disable-next-line no-control-regex
+    const hasNonLatinChars = /[^\u0000-\u007F\u00C0-\u017F\u0100-\u017F\u0180-\u024F]/.test(text);
+    
+    // Check for Tagalog-specific characters
+    const hasTagalogChars = /[ñÑ]/.test(text);
+    
+    return hasNonEnglishWords || hasNonLatinChars || hasTagalogChars;
+  }
+
+  /**
+   * Generate redirect response for non-English queries
+   */
+  private generateLanguageRedirectResponse(userMessage: string): OpenAIResponse {
+    // Detect if it's Tagalog
+    const isTagalog = /(ano|saan|paano|bakit|sino|kailan|alin|gaano|ang|ng|sa|ay|na|pa|din|rin|lang|naman|talaga|ba|po|ho|opo|hindi|oo|salamat|magandang|umaga|hapon|gabi|kumusta|kamusta|mahal)/i.test(userMessage);
+    
+    let response: string;
+    
+    if (isTagalog) {
+      response = `I can help with that, but I'm Luis's chatbot focused on his professional services. Anyway, chatbot ako ni Luis - gusto mo malaman ang **services niya**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Interested ka ba sa **pricing** or **project discussion**?`;
+    } else {
+      response = `I can help with that, but I'm Luis's chatbot focused on his professional services. Anyway, I'm Luis's chatbot - would you like to know about his **services**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Are you interested in **pricing** or **project discussion**?`;
+    }
+    
+    return {
+      content: response,
+      usage: {
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0
+      }
+    };
+  }
+
+  /**
    * Check for inappropriate content
    */
   private isInappropriateContent(text: string): { isInappropriate: boolean, type: 'profanity' | 'personal' | 'none' } {
@@ -189,6 +252,13 @@ export class OpenAIService {
           total_tokens: 0
         }
       };
+    }
+
+    // Check if the message is in a non-English language
+    const isNonEnglish = this.detectNonEnglishLanguage(userMessage);
+    if (isNonEnglish) {
+      console.log(`🌍 Non-English language detected: "${userMessage}"`);
+      return this.generateLanguageRedirectResponse(userMessage);
     }
 
     const context = 

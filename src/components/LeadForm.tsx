@@ -37,17 +37,62 @@ export const LeadForm: React.FC<LeadFormProps> = ({
     phone: ''
   });
 
+  const [errors, setErrors] = useState<Partial<Record<keyof LeadData, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof LeadData, string>> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters long";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    
+    if (!formData.description.trim()) {
+      newErrors.description = "Project description is required";
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = "Description must be at least 10 characters long";
+    }
+
+    if (formData.phone && !/^[+]?[\d\s\-()]{10,}$/.test(formData.phone)) {
+      newErrors.phone = "Please enter a valid phone number";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (field: keyof LeadData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
     try {
       await onSubmit(formData);
       setSubmitStatus('success');
+      
       setTimeout(() => {
         onClose();
         setSubmitStatus('idle');
@@ -61,25 +106,17 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           description: '',
           phone: ''
         });
-      }, 2000);
+        setErrors({});
+      }, 3000);
     } catch (error) {
       console.error('Lead form submission error:', error);
-      
-      // Show specific error message based on error type
-      if (error instanceof Error && error.message.includes('API key')) {
-        setSubmitStatus('error');
-        // You could add a more specific error state here
-      } else {
-        setSubmitStatus('error');
-      }
+      setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (field: keyof LeadData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+
 
   if (!isOpen) return null;
 
