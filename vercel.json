@@ -5,11 +5,6 @@
   "installCommand": "npm install",
   "framework": "create-react-app",
   "public": true,
-  "functions": {
-    "api/send-lead.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "headers": [
     {
       "source": "/static/(.*)",
