@@ -1,12 +1,12 @@
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
-import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import dts from 'rollup-plugin-dts';
+const resolve = require('@rollup/plugin-node-resolve');
+const commonjs = require('@rollup/plugin-commonjs');
+const typescript = require('@rollup/plugin-typescript');
+const peerDepsExternal = require('rollup-plugin-peer-deps-external');
+const dts = require('rollup-plugin-dts');
 
 const packageJson = require('./package-npm.json');
 
-export default [
+module.exports = [
   {
     input: 'src/index.ts',
     output: [
@@ -23,12 +23,12 @@ export default [
     ],
     plugins: [
       peerDepsExternal(),
-      resolve({
+      resolve.default({
         browser: true,
       }),
       commonjs(),
-      typescript({
-        tsconfig: './tsconfig.json',
+      typescript.default({
+        tsconfig: './tsconfig.npm.json',
         exclude: ['**/*.test.*', '**/*.stories.*'],
       }),
     ],
@@ -37,7 +37,7 @@ export default [
   {
     input: 'dist/index.d.ts',
     output: [{ file: 'dist/index.d.ts', format: 'esm' }],
-    plugins: [dts()],
+    plugins: [dts.default()],
     external: [/\.css$/],
   },
 ];

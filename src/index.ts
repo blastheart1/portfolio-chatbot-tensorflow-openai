@@ -1,6 +1,3 @@
-// Import styles
-import './styles.css';
-
 // Main exports for the npm package
 export { EmbeddableChatbot } from './components/EmbeddableChatbot';
 export { Chatbot } from './components/Chatbot';
