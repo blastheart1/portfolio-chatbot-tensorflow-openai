@@ -38,6 +38,27 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   openaiService,
   onLearningExample,
 }) => {
+  // Check if we're in an iframe (embed mode)
+  const isInIframe = window.parent !== window;
+  
+  // Custom close handler for embed mode
+  const handleClose = useCallback(() => {
+    if (isInIframe) {
+      // Send message to parent window to close the overlay
+      console.log('📤 Sending close message to parent window...');
+      window.parent.postMessage('close-chat', '*');
+      
+      // Fallback: also try to close the iframe itself after a short delay
+      setTimeout(() => {
+        console.log('🔄 Fallback: Closing iframe...');
+        window.parent.postMessage('close-chat', '*');
+      }, 100);
+    } else {
+      // Normal close for non-embed mode
+      onClose();
+    }
+  }, [isInIframe, onClose]);
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -608,9 +629,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  // Check if we're in an iframe (embed context)
-  const isInIframe = window.parent !== window;
 
   return (
     <AnimatePresence>
@@ -660,7 +678,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="p-1 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />

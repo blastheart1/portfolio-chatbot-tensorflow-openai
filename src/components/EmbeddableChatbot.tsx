@@ -30,6 +30,18 @@ export const EmbeddableChatbot: React.FC<EmbeddableChatbotProps> = ({
 }) => {
   // Auto-open chat if we're in an iframe (embed context)
   const [isOpen, setIsOpen] = useState(window.parent !== window);
+  
+  // Listen for close messages from parent window
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'close-chat') {
+        setIsOpen(false);
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
   const [isModelReady, setIsModelReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

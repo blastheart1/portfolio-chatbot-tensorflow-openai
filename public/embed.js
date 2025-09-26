@@ -98,8 +98,8 @@
       background: ${isMobile ? 'transparent' : 'rgba(0, 0, 0, 0.5)'};
       z-index: 10000;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: ${isMobile ? 'stretch' : 'center'};
+      justify-content: ${isMobile ? 'stretch' : 'center'};
     `;
     
     // Create chat iframe
@@ -113,22 +113,66 @@
       border: none;
       box-shadow: ${isMobile ? 'none' : '0 20px 40px rgba(0, 0, 0, 0.3)'};
       background: white;
+      position: relative;
     `;
 
+    // Listen for close messages from the iframe
+    const handleIframeMessage = (event) => {
+      console.log('📨 Received message from iframe:', event.data);
+      if (event.data === 'close-chat') {
+        console.log('🚪 Closing chat widget...');
+        if (overlay && overlay.parentNode) {
+          try {
+            document.body.removeChild(overlay);
+            console.log('✅ Widget closed successfully');
+          } catch (error) {
+            console.error('❌ Error closing widget:', error);
+            // Force remove if normal removal fails
+            overlay.style.display = 'none';
+            overlay.remove();
+          }
+        }
+        window.removeEventListener('message', handleIframeMessage);
+      }
+    };
+    
+    window.addEventListener('message', handleIframeMessage);
     overlay.appendChild(chatIframe);
     document.body.appendChild(overlay);
 
-    // Close on overlay click
+    // Close on overlay click (improved for mobile)
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) {
-        document.body.removeChild(overlay);
+        if (overlay && overlay.parentNode) {
+          document.body.removeChild(overlay);
+        }
       }
     });
+    
+    // Add touch events for mobile overlay close
+    if (isMobile) {
+      overlay.addEventListener('touchstart', (e) => {
+        if (e.target === overlay) {
+          e.preventDefault();
+        }
+      });
+      
+      overlay.addEventListener('touchend', (e) => {
+        if (e.target === overlay) {
+          e.preventDefault();
+          if (overlay && overlay.parentNode) {
+            document.body.removeChild(overlay);
+          }
+        }
+      });
+    }
 
     // Close on escape key
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
-        document.body.removeChild(overlay);
+        if (overlay && overlay.parentNode) {
+          document.body.removeChild(overlay);
+        }
         document.removeEventListener('keydown', handleEscape);
       }
     };

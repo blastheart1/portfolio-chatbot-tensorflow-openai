@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luis Chatbot Widget Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .demo-section h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        .code-block::before {
+            content: "💻 Code";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #667eea;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        
+        .demo-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .demo-btn.secondary {
+            background: #6c757d;
+        }
+        
+        .demo-btn.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-online {
+            background: #28a745;
+        }
+        
+        .status-offline {
+            background: #dc3545;
+        }
+        
+        .integration-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .integration-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+        
+        .integration-card h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 3rem;
+            padding: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Luis Chatbot Widget Demo</h1>
+            <p>See how easy it is to embed an AI-powered chatbot on your website</p>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🚀 Quick Start</h2>
+            <p>Add this single line to your website and you're done!</p>
+            <div class="code-block">
+&lt;script src="http://localhost:3000/embed.js" data-api-key="YOUR_OPENAI_API_KEY"&gt;&lt;/script&gt;
+            </div>
+            <p><strong>That's it!</strong> The chatbot will automatically appear as a floating button in the bottom-right corner.</p>
+        </div>
+        
+        <div class="demo-section">
+            <h2>⚙️ Configuration Options</h2>
+            <p>Customize the chatbot to match your brand and preferences:</p>
+            <div class="code-block">
+&lt;script 
+  src="http://localhost:3000/embed.js" 
+  data-api-key="YOUR_OPENAI_API_KEY"
+  data-position="bottom-right"
+  data-theme="light"
+  data-threshold="0.75"&gt;
+&lt;/script&gt;
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎨 Position</h3>
+                    <p><span class="highlight">bottom-right</span> or <span class="highlight">bottom-left</span></p>
+                </div>
+                <div class="feature-card">
+                    <h3>🌙 Theme</h3>
+                    <p><span class="highlight">light</span> or <span class="highlight">dark</span></p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Confidence</h3>
+                    <p>Adjust AI response threshold (0.1 - 1.0)</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔑 API Key</h3>
+                    <p>Your OpenAI API key for AI responses</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>💻 Integration Examples</h2>
+            <div class="integration-examples">
+                <div class="integration-card">
+                    <h4>📄 HTML Website</h4>
+                    <div class="code-block">
+&lt;!-- Add before closing &lt;/body&gt; tag --&gt;
+&lt;script src="http://localhost:3000/embed.js" 
+        data-api-key="YOUR_OPENAI_API_KEY"&gt;&lt;/script&gt;
+                    </div>
+                </div>
+                
+                <div class="integration-card">
+                    <h4>⚛️ React/Next.js</h4>
+                    <div class="code-block">
+useEffect(() => {
+  const script = document.createElement('script');
+  script.src = 'http://localhost:3000/embed.js';
+  script.setAttribute('data-api-key', 'YOUR_OPENAI_API_KEY');
+  document.body.appendChild(script);
+  
+  return () => document.body.removeChild(script);
+}, []);
+                    </div>
+                </div>
+                
+                <div class="integration-card">
+                    <h4>🌐 WordPress</h4>
+                    <div class="code-block">
+// Add to footer.php before &lt;/body&gt;
+&lt;script src="http://localhost:3000/embed.js" 
+        data-api-key="YOUR_OPENAI_API_KEY"&gt;&lt;/script&gt;
+                    </div>
+                </div>
+                
+                <div class="integration-card">
+                    <h4>📱 Shopify</h4>
+                    <div class="code-block">
+// Add to theme.liquid before &lt;/body&gt;
+&lt;script src="http://localhost:3000/embed.js" 
+        data-api-key="YOUR_OPENAI_API_KEY"&gt;&lt;/script&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🎯 Advanced Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🤖 AI-Powered</h3>
+                    <p>Uses TensorFlow.js and OpenAI for intelligent responses</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📱 Mobile Optimized</h3>
+                    <p>Responsive design that works on all devices</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Lead Generation</h3>
+                    <p>Automatically captures leads with smart forms</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🌍 Multi-Language</h3>
+                    <p>Supports English, Tagalog, and Taglish responses</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Fast Loading</h3>
+                    <p>Lightweight with minimal impact on your site</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔒 Secure</h3>
+                    <p>API keys handled securely with no external storage</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🧪 Test the Chatbot</h2>
+            <p>Try these demo interactions to see the chatbot in action:</p>
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="testPricing()">💰 Ask about pricing</button>
+                <button class="demo-btn" onclick="testServices()">🛠️ Inquire about services</button>
+                <button class="demo-btn" onclick="testContact()">📞 Contact information</button>
+                <button class="demo-btn secondary" onclick="testTagalog()">🇵🇭 Test Tagalog</button>
+            </div>
+            <p><strong>Click the <span class="highlight">💬</span> button in the bottom-right corner to start chatting!</strong></p>
+        </div>
+        
+        <div class="demo-section">
+            <h2>📊 Live Demo Status</h2>
+            <p>Current chatbot status: <span class="status-indicator status-online"></span>Online and ready</p>
+            <p>This demo uses a placeholder API key. For full functionality, replace with your actual OpenAI API key.</p>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>🚀 <strong>Luis Chatbot Widget</strong> - AI-powered customer engagement</p>
+        <p>Built with ❤️ by Luis Santos | <a href="https://my-portfolio-jusu.vercel.app/" style="color: white;">View Portfolio</a></p>
+    </div>
+    
+    <!-- Chatbot Widget Integration -->
+    <script src="http://localhost:3000/embed.js" data-api-key="demo-key"></script>
+    
+    <script>
+        // Demo interaction functions
+        function testPricing() {
+            alert('💡 Try asking: "How much do you charge for a website?" or "What are your pricing packages?"');
+        }
+        
+        function testServices() {
+            alert('💡 Try asking: "What services do you offer?" or "Can you build me a website?"');
+        }
+        
+        function testContact() {
+            alert('💡 Try asking: "How can I contact you?" or "What\'s your email address?"');
+        }
+        
+        function testTagalog() {
+            alert('💡 Try asking in Tagalog: "Magkano ang website?" or "Ano ang services mo?"');
+        }
+        
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling to sections
+            const sections = document.querySelectorAll('.demo-section');
+            sections.forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+            
+            // Animate sections on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
