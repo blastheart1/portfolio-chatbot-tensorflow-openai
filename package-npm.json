@@ -1,0 +1,50 @@
+{
+  "name": "luis-ai-chatbot",
+  "version": "1.0.0",
+  "description": "AI-powered chatbot component with TensorFlow.js and OpenAI integration",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "echo 'No build step needed for Git distribution'",
+    "dev": "echo 'Development mode - use your existing React scripts'"
+  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "tensorflow",
+    "openai",
+    "react",
+    "typescript",
+    "machine-learning",
+    "nlp"
+  ],
+  "author": "Luis Santos",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/luis-ai-chatbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/luis-ai-chatbot/issues"
+  },
+  "homepage": "https://github.com/your-username/luis-ai-chatbot#readme",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.15.0",
+    "framer-motion": "^10.16.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^4.9.5"
+  }
+}
