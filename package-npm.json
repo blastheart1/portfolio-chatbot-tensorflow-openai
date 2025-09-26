@@ -2,16 +2,17 @@
   "name": "luis-ai-chatbot",
   "version": "1.0.0",
   "description": "AI-powered chatbot component with TensorFlow.js and OpenAI integration",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "src",
+    "dist",
     "README.md",
     "package.json"
   ],
   "scripts": {
-    "build": "echo 'No build step needed for Git distribution'",
-    "dev": "echo 'Development mode - use your existing React scripts'"
+    "build": "tsc --project tsconfig.npm.json",
+    "dev": "tsc --project tsconfig.npm.json --watch",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "chatbot",
