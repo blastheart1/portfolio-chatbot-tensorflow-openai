@@ -4,7 +4,7 @@ import { } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { PerformanceMonitor } from './PerformanceMonitor';
 import { PerformanceToggle } from './PerformanceToggle';
-import TensorFlowService from '../lib/tensorflowModel';
+import { TensorFlowService } from '../lib/tensorflowModel';
 import { OpenAIService } from '../lib/openaiService';
 
 interface ChatbotProps {

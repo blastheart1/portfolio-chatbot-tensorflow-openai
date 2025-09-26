@@ -264,6 +264,42 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     setIsTyping(true);
 
     try {
+      // Check for lead generation response FIRST (before regular processing)
+      const isPositiveResponse = checkFollowUpInterest(userMessage.content);
+      const isNegativeResponse = userMessage.content.toLowerCase().includes('no') || 
+                               userMessage.content.toLowerCase().includes('not interested') ||
+                               userMessage.content.toLowerCase().includes('not now');
+      const lastMessage = messages[messages.length - 1];
+      
+      if (isPositiveResponse && lastMessage && lastMessage.content.includes('Would you like me to reach out')) {
+        console.log('✅ User expressed interest in follow-up discussion');
+        // Show the lead form immediately
+        setTimeout(() => {
+          setShowLeadForm(true);
+        }, 1000);
+        
+        setIsTyping(false);
+        return; // Exit early - don't process as regular message
+      } else if (isNegativeResponse && lastMessage && lastMessage.content.includes('Would you like me to reach out')) {
+        console.log('❌ User declined follow-up discussion');
+        // Provide a polite acknowledgment
+        setTimeout(() => {
+          const acknowledgmentMessage: Message = {
+            id: generateUniqueId(),
+            content: "No problem at all! Feel free to reach out anytime if you have questions about my services. I'm here to help whenever you're ready!",
+            isUser: false,
+            timestamp: new Date(),
+            source: 'faq',
+            confidence: 0.9,
+            relevance: 0.7,
+          };
+          setMessages(prev => [...prev, acknowledgmentMessage]);
+        }, 1000);
+        
+        setIsTyping(false);
+        return; // Exit early - don't process as regular message
+      }
+
       let response: Message;
       let usedOpenAI = false;
       let openAiResponse = '';
@@ -415,36 +451,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             setLeadTriggerContext(leadTrigger.triggerContext);
             // Don't show form yet - wait for user response
           }, 1500);
-        } else {
-          // Check if this might be a response to a follow-up question
-          const isPositiveResponse = checkFollowUpInterest(userMessage.content);
-          const isNegativeResponse = userMessage.content.toLowerCase().includes('no') || 
-                                   userMessage.content.toLowerCase().includes('not interested') ||
-                                   userMessage.content.toLowerCase().includes('not now');
-          const lastMessage = messages[messages.length - 1];
-          
-          if (isPositiveResponse && lastMessage && lastMessage.content.includes('Would you like me to reach out')) {
-            console.log('✅ User expressed interest in follow-up discussion');
-            // Show the lead form since they're interested
-            setTimeout(() => {
-              setShowLeadForm(true);
-            }, 1000);
-          } else if (isNegativeResponse && lastMessage && lastMessage.content.includes('Would you like me to reach out')) {
-            console.log('❌ User declined follow-up discussion');
-            // Provide a polite acknowledgment
-            setTimeout(() => {
-              const acknowledgmentMessage: Message = {
-                id: generateUniqueId(),
-                content: "No problem at all! Feel free to reach out anytime if you have questions about my services. I'm here to help whenever you're ready!",
-                isUser: false,
-                timestamp: new Date(),
-                source: 'faq',
-                confidence: 0.9,
-                relevance: 0.7,
-              };
-              setMessages(prev => [...prev, acknowledgmentMessage]);
-            }, 1000);
-          }
         }
 
         // Show learning prompt if OpenAI was used
@@ -488,6 +494,21 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       await resendService.current.sendWelcomeEmail(leadData);
       
       console.log('✅ Lead submitted successfully:', leadData);
+      
+      // Add thank you message after successful submission
+      setTimeout(() => {
+        const thankYouMessage: Message = {
+          id: generateUniqueId(),
+          content: "Thank you! Luis will reach out to you within 24-48 hours. Is there anything else I can help you with?",
+          isUser: false,
+          timestamp: new Date(),
+          source: 'faq',
+          confidence: 0.9,
+          relevance: 0.8,
+        };
+        setMessages(prev => [...prev, thankYouMessage]);
+      }, 1000);
+      
     } catch (error) {
       console.error('❌ Failed to submit lead:', error);
       throw error; // Re-throw so the form can handle the error
@@ -760,7 +781,22 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       {/* Lead Generation Form */}
       <LeadForm
         isOpen={showLeadForm}
-        onClose={() => setShowLeadForm(false)}
+        onClose={() => {
+          setShowLeadForm(false);
+          // Add cancellation message when form is closed without submission
+          setTimeout(() => {
+            const cancellationMessage: Message = {
+              id: generateUniqueId(),
+              content: "I see you did not finish your form, just let me know anytime you're interested in my service. Thank you! Is there anything else?",
+              isUser: false,
+              timestamp: new Date(),
+              source: 'faq',
+              confidence: 0.9,
+              relevance: 0.8,
+            };
+            setMessages(prev => [...prev, cancellationMessage]);
+          }, 1000);
+        }}
         onSubmit={handleLeadSubmission}
         triggerContext={leadTriggerContext}
       />

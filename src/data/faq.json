@@ -57,6 +57,34 @@
       ]
     },
     {
+      "tag": "general.what_can_you_offer",
+      "patterns": [
+        "What can you offer?",
+        "What do you offer?",
+        "What services do you provide?",
+        "What can you do for me?",
+        "What are your services?",
+        "What do you provide?",
+        "What can you help with?",
+        "What solutions do you offer?",
+        "What can you build?",
+        "What do you create?",
+        "What kind of work do you do?",
+        "What projects can you handle?",
+        "What can you develop?",
+        "What do you specialize in?",
+        "What are your capabilities?",
+        "What can you deliver?",
+        "What do you offer clients?",
+        "What services are available?",
+        "What can you help me with?",
+        "What do you do for clients?"
+      ],
+      "responses": [
+        "I can do a lot of things! Let me break down what I offer:\n\n**🌐 Website Development**\nI build modern, responsive websites that actually work. From simple business sites to complex e-commerce platforms - I've got you covered.\n\n**🤖 AI Chatbot Solutions**\nLike this one you're talking to! I create intelligent chatbots that can handle customer support, lead generation, and automate your business processes.\n\n**💻 Full-Stack Development**\nFrontend, backend, databases - I handle the complete development cycle using cutting-edge technologies like React, Node.js, and PostgreSQL.\n\n**🏢 Enterprise Solutions**\nAs a Senior IBM ODM Specialist, I design Business Rule Management Systems that help large organizations automate complex decision-making processes.\n\n**👥 Team Leadership & QA**\nI lead development teams and ensure quality through comprehensive testing and process optimization.\n\n**💰 Pricing**\n• **Starter Websites**: ₱22,000 ($599 overseas)\n• **Professional Sites**: ₱45,000 ($1,199 overseas) \n• **Enterprise Solutions**: ₱100,000 ($2,999 overseas)\n\nWhat kind of project are you thinking about? I'd love to help make it happen!"
+      ]
+    },
+    {
       "tag": "about.who_are_you",
       "patterns": [
         "Who are you?",

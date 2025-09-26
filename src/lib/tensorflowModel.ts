@@ -779,11 +779,11 @@ export class TensorFlowService {
       };
     }
     
-    if (lowerInput.includes('services') || lowerInput.includes('what services') || lowerInput.includes('what can you help') || lowerInput.includes('solutions')) {
+    if (lowerInput.includes('services') || lowerInput.includes('what services') || lowerInput.includes('what can you help') || lowerInput.includes('solutions') || lowerInput.includes('what can you offer') || lowerInput.includes('what do you offer')) {
       return {
         tag: 'luis.direct_answer',
         confidence: 0.8,
-        response: "Hello! I offer a range of services tailored to meet your needs:\n\n**1. Website Development**\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses\n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using React, Next.js, TypeScript, Node.js, Express, and PostgreSQL.\n\n**4. BRMS Solutions**\nAs a Senior IBM ODM Specialist, I provide Business Rule Management Systems for enterprise solutions.\n\n**5. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!",
+        response: "I can do a lot of things! Let me break down what I offer:\n\n**🌐 Website Development**\nI build modern, responsive websites that actually work. From simple business sites to complex e-commerce platforms - I've got you covered.\n\n**🤖 AI Chatbot Solutions**\nLike this one you're talking to! I create intelligent chatbots that can handle customer support, lead generation, and automate your business processes.\n\n**💻 Full-Stack Development**\nFrontend, backend, databases - I handle the complete development cycle using cutting-edge technologies like React, Node.js, and PostgreSQL.\n\n**🏢 Enterprise Solutions**\nAs a Senior IBM ODM Specialist, I design Business Rule Management Systems that help large organizations automate complex decision-making processes.\n\n**👥 Team Leadership & QA**\nI lead development teams and ensure quality through comprehensive testing and process optimization.\n\n**💰 Pricing**\n• **Starter Websites**: ₱22,000 ($599 overseas)\n• **Professional Sites**: ₱45,000 ($1,199 overseas) \n• **Enterprise Solutions**: ₱100,000 ($2,999 overseas)\n\nWhat kind of project are you thinking about? I'd love to help make it happen!",
         relevance,
         source: 'faq'
       };
@@ -993,5 +993,3 @@ export class TensorFlowService {
     };
   }
 }
-
-export default TensorFlowService;

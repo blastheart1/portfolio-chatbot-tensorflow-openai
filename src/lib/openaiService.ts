@@ -204,9 +204,26 @@ export class OpenAIService {
     let response: string;
     
     if (isTagalog) {
-      response = `I can help with that, but I'm Luis' chatbot focused on his professional services. Anyway, chatbot ako ni Luis - gusto mo malaman ang **services niya**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Interested ka ba sa **pricing** or **project discussion**?`;
+      // Conversational Tagalog and Taglish variations with pricing and lead generation
+      const tagalogVariations = [
+        // Conversational Tagalog Versions
+        "Hi! Ako yung chatbot ni Luis. Services niya: **Website Development** (₱22k–₱100k depende sa package), **AI Chatbot Integration** (₱7k–₱15k add-on or free sa Enterprise), **Full-stack apps** gamit modern tech, at **QA/Project Management** para smooth at reliable delivery. Gusto mo ba **pricing details** o **project discussion** na agad?",
+        "Hello! Chatbot ni Luis 'to. Pwede siya sa: **Website builds** (Starter ₱22k, Pro ₱45k, Enterprise ₱100k), **AI Chatbots** (₱7k–₱15k or free sa Enterprise), **Full-stack Development** with AI integration, at **QA Management** para siguradong quality ang output. Interesado ka ba makita yung **packages**?",
+        "Kumusta! Ako ang chatbot ni Luis. Inaalok niya: **Website packages** (₱22k–₱100k), **AI Chatbots** (₱7k–₱15k add-on or kasama sa Enterprise), **Full-stack solutions** with AI, at **Project + QA Management** para hassle-free at on-time delivery. Gusto mo ba malaman alin bagay sa'yo?",
+        // Conversational Taglish Versions
+        "Hey! I'm Luis's chatbot. He offers: **Websites** (₱22k–₱100k), **AI Chatbots** (₱7k–₱15k add-on or free with Enterprise), **Full-stack dev** with React/Next.js/AI, plus **QA & Project Management** para sure na polished at reliable ang delivery. Want me to walk you through **packages**?",
+        "Hi! Ako yung chatbot ni Luis. Services niya include: **Website Development** (₱22k–₱100k), **AI Chatbot add-ons** (₱7k–₱15k or free with Enterprise), **Full-stack Development** with AI, and **QA + Project Management** para efficient at smooth delivery. Curious ka ba sa **pricing**?",
+        "Hello! Chatbot ni Luis here. Quick rundown ng services niya: **Websites** (Starter ₱22k, Pro ₱45k, Enterprise ₱100k), **AI Chatbots** (₱7k–₱15k or free with Enterprise), **Full-stack apps** with AI, and **QA/Project Management** to keep everything on track. Gusto mo ba **detailed breakdown** or usap tayo about your **project**?"
+      ];
+      response = tagalogVariations[Math.floor(Math.random() * tagalogVariations.length)];
     } else {
-      response = `I can help with that, but I'm Luis' chatbot focused on his professional services. Anyway, I'm Luis' chatbot - would you like to know about his **services**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Are you interested in **pricing** or **project discussion**?`;
+      // English variations
+      const englishVariations = [
+        "Sure, I can help with that! I'm Luis' chatbot and I handle inquiries about his professional services. Want to know what he offers? He specializes in **website development**, **AI chatbot solutions**, and **full-stack applications**. Would you like to check out the **pricing** or jump into a **project discussion**?",
+        "Hi there! I'm Luis' chatbot. He provides services like **website development**, **AI chatbot integration**, and **full-stack development**. Do you want me to share the **pricing details** or go straight into **project discussion**?",
+        "Got it! I'm Luis' chatbot here to help with his professional services. He offers **website development**, **AI chatbot solutions**, and **full-stack development**. Would you like to explore the **packages** or talk about your **project directly**?"
+      ];
+      response = englishVariations[Math.floor(Math.random() * englishVariations.length)];
     }
     
     return {
