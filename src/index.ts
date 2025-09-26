@@ -1,3 +1,6 @@
+// Import styles
+import './styles.css';
+
 // Main exports for the npm package
 export { EmbeddableChatbot } from './components/EmbeddableChatbot';
 export { Chatbot } from './components/Chatbot';
@@ -50,38 +53,3 @@ export interface ChatbotStatus {
   learningCount: number;
   isConfigured: boolean;
 }
-
-// Default export for easy importing
-import { EmbeddableChatbot as EC } from './components/EmbeddableChatbot';
-import { Chatbot as C } from './components/Chatbot';
-import { ChatWindow as CW } from './components/ChatWindow';
-import { LeadForm as LF } from './components/LeadForm';
-import { MarkdownText as MT } from './components/MarkdownText';
-import { MessageBubble as MB } from './components/MessageBubble';
-import { PerformanceMonitor as PM } from './components/PerformanceMonitor';
-import { PerformanceToggle as PT } from './components/PerformanceToggle';
-import { PortfolioChatbot as PC } from './components/PortfolioChatbot';
-import { QuickSuggestions as QS } from './components/QuickSuggestions';
-import { TensorFlowService as TFS } from './lib/tensorflowModel';
-import { OpenAIService as OAS } from './lib/openaiService';
-import { LeadDetectionService as LDS } from './lib/leadDetectionService';
-import { ResendService as RS } from './lib/resendService';
-import { SecurityService as SS } from './lib/securityService';
-
-export default {
-  EmbeddableChatbot: EC,
-  Chatbot: C,
-  ChatWindow: CW,
-  LeadForm: LF,
-  MarkdownText: MT,
-  MessageBubble: MB,
-  PerformanceMonitor: PM,
-  PerformanceToggle: PT,
-  PortfolioChatbot: PC,
-  QuickSuggestions: QS,
-  TensorFlowService: TFS,
-  OpenAIService: OAS,
-  LeadDetectionService: LDS,
-  ResendService: RS,
-  SecurityService: SS
-};
