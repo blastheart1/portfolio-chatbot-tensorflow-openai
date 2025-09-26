@@ -302,10 +302,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             };
           } else {
             // No direct answer available, use OpenAI with Luis context
-            console.log('🤖 Using OpenAI with Luis context for complex questions...');
+            console.log('🤖 Using OpenAI with Luis context for complex/generic questions...');
             if (openaiService.isConfigured()) {
               try {
-                const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content);
+                const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content, messages);
                 openAiResponse = aiResponse.content;
                 usedOpenAI = true;
                 response = {
@@ -351,7 +351,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           };
         } else if (openaiService.isConfigured()) {
           try {
-            const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content);
+            const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content, messages);
             openAiResponse = aiResponse.content;
             usedOpenAI = true;
             response = {
@@ -576,7 +576,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   // Detect if we're on mobile
-  const isMobile = window.innerWidth <= 768;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // Update mobile detection on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Check if we're in an iframe (embed context)
   const isInIframe = window.parent !== window;

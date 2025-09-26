@@ -1,6 +1,62 @@
 {
   "intents": [
     {
+      "tag": "general.what_do_you_do",
+      "patterns": [
+        "What do you do?",
+        "What do you work on?",
+        "What's your job?",
+        "What's your role?",
+        "What kind of work do you do?",
+        "What are your responsibilities?",
+        "What do you specialize in?",
+        "What's your profession?",
+        "What's your career?",
+        "What do you do for work?",
+        "What's your occupation?",
+        "What kind of developer are you?",
+        "What type of work do you do?",
+        "What are you good at?",
+        "What do you excel in?",
+        "What's your expertise?",
+        "What do you focus on?",
+        "What's your main work?",
+        "What do you handle?",
+        "What are you responsible for?"
+      ],
+      "responses": [
+        "I'm a Full-Stack Developer who leverages AI, machine learning, and generative technologies to elevate business processes, automate complex workflows, and create intelligent solutions that drive measurable results and competitive advantage."
+      ]
+    },
+    {
+      "tag": "general.what_kind_of_websites",
+      "patterns": [
+        "What kind of webpages do you do?",
+        "What types of websites do you build?",
+        "What kind of sites do you create?",
+        "What websites do you make?",
+        "What kind of web development do you do?",
+        "What types of projects do you work on?",
+        "What kind of applications do you build?",
+        "What sort of websites do you develop?",
+        "What kind of web projects do you handle?",
+        "What types of sites do you specialize in?",
+        "What kind of web solutions do you provide?",
+        "What sort of development do you do?",
+        "What kind of software do you build?",
+        "What types of apps do you create?",
+        "What kind of platforms do you develop?",
+        "What sort of systems do you build?",
+        "What kind of solutions do you provide?",
+        "What types of products do you create?",
+        "What kind of services do you offer?",
+        "What sort of work do you specialize in?"
+      ],
+      "responses": [
+        "I build comprehensive web solutions including: E-commerce websites with payment integration, AI-powered chatbots, Full-stack applications with React/Next.js, Mobile-responsive websites, Progressive Web Apps (PWA), Custom web applications, Portfolio websites, and Enterprise solutions. I specialize in modern tech stacks using TypeScript, Node.js, PostgreSQL, and AI integration."
+      ]
+    },
+    {
       "tag": "about.who_are_you",
       "patterns": [
         "Who are you?",
@@ -15,7 +71,7 @@
         "Tell me about Antonio Luis Santos"
       ],
       "responses": [
-        "I'm Luis, a Full-Stack Developer passionate about applying AI, machine learning, and generative tech to automate processes, optimize performance, and unlock innovation. In addition, I lead as a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards."
+        "I'm Luis, a Full-Stack Developer passionate about applying AI, machine learning, and generative tech to automate processes, optimize performance, and unlock innovation."
       ]
     },
     {
@@ -29,7 +85,7 @@
         "What's your current position?"
       ],
       "responses": [
-        "I'm Luis :) , a Full-Stack Developer with a focus on AI, machine learning, and generative technologies to elevate efficiency and create intelligent solutions. Alongside this, I serve as a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards, where I combine technical expertise with leadership."
+        "I'm Luis :) , a Full-Stack Developer with a focus on AI, machine learning, and generative technologies to elevate efficiency and create intelligent solutions."
       ]
     },
     {
@@ -43,7 +99,7 @@
         "What companies have you worked for?"
       ],
       "responses": [
-        "I'm Luis, a Full-Stack Developer passionate about applying AI, machine learning, and generative tech to automate processes, optimize performance, and unlock innovation. In addition, I lead as a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards."
+        "I'm Luis, a Full-Stack Developer passionate about applying AI, machine learning, and generative tech to automate processes, optimize performance, and unlock innovation."
       ]
     },
     {
@@ -57,7 +113,7 @@
         "What's your main focus?"
       ],
       "responses": [
-        "I specialize in Full-Stack Development, AI solutions, and scalable systems. My expertise spans IBM ODM (BRMS), QA Team Management, modern web development with React/Next.js, and AI chatbot development. I excel at building future-ready applications that deliver results while maintaining accuracy and reliability."
+        "I specialize in Full-Stack Development, AI solutions, and scalable systems. My expertise spans modern web development with React/Next.js, and AI chatbot development. I excel at building future-ready applications that deliver results while maintaining accuracy and reliability."
       ]
     },
     {
@@ -103,20 +159,6 @@
       ],
       "responses": [
         "I work with a full range of DevOps and cloud tools including Docker, AWS, Vercel, Git, GitHub, Postman, Zapier, ngrok, Netlify, and Google Cloud. I handle deployment, containerization, CI/CD pipelines, and cloud infrastructure management."
-      ]
-    },
-    {
-      "tag": "skills.brms",
-      "patterns": [
-        "What's your experience with BRMS?",
-        "Do you work with IBM ODM?",
-        "What about business rules?",
-        "Do you know Operational Decision Manager?",
-        "What's your BRMS expertise?",
-        "Have you worked with decision management?"
-      ],
-      "responses": [
-        "I'm a Senior IBM ODM Specialist with extensive experience in Business Rule Management Systems (BRMS). I design, test, and deploy business rules using IBM Operational Decision Manager to align software logic with enterprise needs. I lead end-to-end development of IBM ODM BRMS solutions aligned with business and technical requirements."
       ]
     },
     {
@@ -202,6 +244,44 @@
       ]
     },
     {
+      "tag": "services.ecommerce",
+      "patterns": [
+        "Do you do ecommerce sites?",
+        "Can you build ecommerce websites?",
+        "Do you create online stores?",
+        "Can you make an e-commerce site?",
+        "Do you build shopping websites?",
+        "Can you develop online shops?",
+        "Do you work on ecommerce projects?",
+        "Can you create an online store?",
+        "Do you build e-commerce platforms?",
+        "Can you make shopping sites?",
+        "Do you develop online retail sites?",
+        "Can you create ecommerce solutions?",
+        "Do you work with online stores?",
+        "Can you build digital stores?",
+        "Do you create web stores?",
+        "Can you develop ecommerce applications?",
+        "Do you build online marketplaces?",
+        "Can you create retail websites?",
+        "Do you work on shopping platforms?",
+        "Can you build ecommerce systems?",
+        "Do you handle ecommerce development?",
+        "Can you make online retail sites?",
+        "Do you work with digital commerce?",
+        "Can you create online shopping platforms?",
+        "Do you build ecommerce platforms?",
+        "Can you develop online marketplaces?",
+        "Do you work on digital stores?",
+        "Can you create shopping websites?",
+        "Do you build retail platforms?",
+        "Can you develop ecommerce websites?"
+      ],
+      "responses": [
+        "Yes! I specialize in building comprehensive e-commerce websites and online stores. I create full-featured e-commerce solutions with payment integration (Stripe, PayPal), inventory management, user authentication, shopping cart functionality, order processing, and AI chatbot support. I use modern tech stacks like React, Next.js, Node.js, and PostgreSQL to build scalable online stores that can handle high traffic and complex business requirements."
+      ]
+    },
+    {
       "tag": "services.chatbots",
       "patterns": [
         "Do you build AI chatbots?",
@@ -226,7 +306,7 @@
         "What consulting do you offer?"
       ],
       "responses": [
-        "Yes, I provide consulting in AI chatbot development, front-end architecture with React and Tailwind, QA team management, BRMS development, full-stack development, and automation workflow optimization. I'm available for freelance opportunities and project consultations."
+        "Yes, I provide consulting in AI chatbot development, front-end architecture with React and Tailwind, QA team management, full-stack development, and automation workflow optimization. I'm available for freelance opportunities and project consultations."
       ]
     },
     {
@@ -259,7 +339,7 @@
         "What solutions do you offer?"
       ],
       "responses": [
-        "Hello! I offer a range of services tailored to meet your needs. Here are some of the services I provide:\n\n**1. Website Development**\nI offer three packages to cater to different requirements:\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses  \n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using:\n• React, Next.js, TypeScript\n• Node.js, Express, PostgreSQL\n• AI/ML integration and generative technologies\n\n**4. BRMS Solutions**\nAs a Senior IBM ODM Specialist, I provide Business Rule Management Systems for enterprise solutions.\n\n**5. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!"
+        "Hello! I offer a range of services tailored to meet your needs. Here are some of the services I provide:\n\n**1. Website Development**\nI offer three packages to cater to different requirements:\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses  \n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using:\n• React, Next.js, TypeScript\n• Node.js, Express, PostgreSQL\n• AI/ML integration and generative technologies\n\n**4. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!"
       ]
     },
     {
@@ -399,7 +479,7 @@
         "Can I hire you for a project?"
       ],
       "responses": [
-        "Yes, I'm open to collaborations in software projects, AI experiments, or hobby-related content. I'm available for freelance opportunities in full-stack development, AI chatbot design, BRMS development, and QA process optimization. Feel free to reach out to discuss your project needs!"
+        "Yes, I'm open to collaborations in software projects, AI experiments, or hobby-related content. I'm available for freelance opportunities in full-stack development, AI chatbot design, and QA process optimization. Feel free to reach out to discuss your project needs!"
       ]
     },
     {
@@ -414,6 +494,29 @@
       ],
       "responses": [
         "I offer three website packages: Starter at ₱22,000 ($599 overseas) for small businesses with up to 5 pages, Professional at ₱45,000 ($1,199 overseas) for growing businesses with up to 15 pages, and Enterprise at ₱100,000 ($2,999 overseas) for large organizations with unlimited pages. All include responsive design, SEO, hosting, and AI chatbot integration."
+      ]
+    },
+    {
+      "tag": "pricing.ecommerce",
+      "patterns": [
+        "How much for ecommerce websites?",
+        "What's the cost of online stores?",
+        "How much for ecommerce development?",
+        "What's the price for online shops?",
+        "How much for shopping websites?",
+        "What's the cost of ecommerce sites?",
+        "How much for digital stores?",
+        "What's the price for web stores?",
+        "How much for online marketplaces?",
+        "What's the cost of retail websites?",
+        "How much for ecommerce platforms?",
+        "What's the price for shopping platforms?",
+        "How much for ecommerce systems?",
+        "What's the cost of online retail?",
+        "How much for digital commerce?"
+      ],
+      "responses": [
+        "E-commerce website pricing depends on complexity and features. Basic online stores start at ₱45,000 ($1,199 overseas), mid-level e-commerce sites with advanced features are ₱80,000 ($2,199 overseas), and enterprise e-commerce platforms with custom functionality start at ₱150,000 ($3,999 overseas). All include payment integration, inventory management, user accounts, mobile optimization, and AI chatbot support. Pricing varies based on product catalog size, payment methods, custom features, and integration requirements."
       ]
     },
     {
@@ -506,7 +609,31 @@
         "Yo",
         "What's up",
         "Hi there",
-        "Greetings"
+        "Greetings",
+        "Hello there",
+        "Hey there",
+        "Hiya",
+        "Howdy",
+        "Good day",
+        "Morning",
+        "Afternoon",
+        "Evening",
+        "Sup",
+        "What's happening",
+        "How are you",
+        "How's it going",
+        "How do you do",
+        "Nice to meet you",
+        "Pleasure to meet you",
+        "Good to see you",
+        "Great to see you",
+        "Welcome",
+        "Hello Luis",
+        "Hi Luis",
+        "Hey Luis",
+        "Hello Antonio",
+        "Hi Antonio",
+        "Hey Antonio"
       ],
       "responses": [
         "Hey there! I'm Luis, nice to meet you. How can I help you today?",
@@ -600,9 +727,9 @@
         "What do you do Luis?"
       ],
       "responses": [
-        "I'm Luis's AI assistant, here to help you learn about his professional background, skills, and services.",
-        "I'm a friendly AI assistant trained to chat and answer questions about Luis's work and expertise.",
-        "Think of me as your digital gateway to learning about Luis's professional journey and capabilities."
+        "I'm Luis' AI assistant, here to help you learn about his professional background, skills, and services.",
+        "I'm a friendly AI assistant trained to chat and answer questions about Luis' work and expertise.",
+        "Think of me as your digital gateway to learning about Luis' professional journey and capabilities."
       ]
     }
   ]

@@ -14,8 +14,37 @@ export interface OpenAIResponse {
   };
 }
 
+export interface Message {
+  id: string;
+  content: string;
+  isUser: boolean;
+  timestamp: Date;
+  source?: string;
+  confidence?: number;
+  relevance?: number;
+}
+
 export class OpenAIService {
   private config: OpenAIConfig;
+  
+  // Performance optimization properties
+  private responseCache = new Map<string, OpenAIResponse>();
+  private maxCacheSize = 50;
+  private requestQueue: Array<() => Promise<void>> = [];
+  private isProcessingQueue = false;
+  private rateLimitDelay = 1000; // 1 second between requests
+  private lastRequestTime = 0;
+  private usageStats = {
+    totalRequests: 0,
+    totalTokens: 0,
+    totalCost: 0,
+    averageResponseTime: 0
+  };
+  
+  // Response optimization properties
+  private maxResponseLength = 500; // Maximum response length in characters
+  private maxTokens = 150; // Maximum tokens for response
+  private responseCompression = true;
 
   // Content filtering for inappropriate content
   private inappropriateWords: string[] = [
@@ -52,6 +81,86 @@ export class OpenAIService {
    */
   private detectNonEnglishLanguage(text: string): boolean {
     const lowerText = text.toLowerCase().trim();
+    
+    // Common English words that should never be flagged as non-English
+    const commonEnglishWords = [
+      'background', 'experience', 'skills', 'services', 'pricing', 'contact',
+      'about', 'work', 'project', 'website', 'development', 'chatbot',
+      'ai', 'technology', 'software', 'programming', 'code', 'build',
+      'create', 'design', 'help', 'hello', 'hi', 'thanks', 'thank you',
+      'yes', 'no', 'ok', 'okay', 'sure', 'please', 'what', 'how', 'when',
+      'where', 'why', 'who', 'which', 'can', 'will', 'would', 'could',
+      'should', 'might', 'may', 'do', 'does', 'did', 'are', 'is', 'was',
+      'were', 'have', 'has', 'had', 'get', 'got', 'give', 'gave', 'take',
+      'took', 'make', 'made', 'go', 'went', 'come', 'came', 'see', 'saw',
+      'know', 'knew', 'think', 'thought', 'want', 'wanted', 'need', 'needed',
+      'like', 'liked', 'love', 'loved', 'use', 'used', 'find', 'found',
+      'look', 'looked', 'feel', 'felt', 'seem', 'seemed', 'become', 'became',
+      'leave', 'left', 'put', 'bring', 'brought', 'begin', 'began', 'start',
+      'started', 'turn', 'turned', 'move', 'moved', 'live', 'lived', 'try',
+      'tried', 'call', 'called', 'ask', 'asked', 'work', 'worked', 'play',
+      'played', 'run', 'ran', 'walk', 'walked', 'sit', 'sat', 'stand',
+      'stood', 'open', 'opened', 'close', 'closed', 'stop', 'stopped',
+      'show', 'showed', 'tell', 'told', 'hear', 'heard', 'listen', 'listened',
+      'read', 'write', 'wrote', 'speak', 'spoke', 'talk', 'talked', 'say',
+      'said', 'give', 'gave', 'send', 'sent', 'buy', 'bought', 'sell',
+      'sold', 'pay', 'paid', 'cost', 'spend', 'spent', 'save', 'saved',
+      'keep', 'kept', 'hold', 'held', 'carry', 'carried', 'bring', 'brought',
+      'take', 'took', 'put', 'place', 'placed', 'set', 'sit', 'sat',
+      'stand', 'stood', 'lie', 'lay', 'sleep', 'slept', 'wake', 'woke',
+      'eat', 'ate', 'drink', 'drank', 'cook', 'cooked', 'clean', 'cleaned',
+      'wash', 'washed', 'dry', 'dried', 'cut', 'break', 'broke', 'fix',
+      'fixed', 'repair', 'repaired', 'build', 'built', 'make', 'made',
+      'create', 'created', 'design', 'designed', 'draw', 'drew', 'paint',
+      'painted', 'color', 'colored', 'write', 'wrote', 'type', 'typed',
+      'print', 'printed', 'copy', 'copied', 'paste', 'pasted', 'delete',
+      'deleted', 'save', 'saved', 'load', 'loaded', 'download', 'downloaded',
+      'upload', 'uploaded', 'send', 'sent', 'receive', 'received', 'get',
+      'got', 'fetch', 'fetched', 'pull', 'pulled', 'push', 'pushed',
+      'connect', 'connected', 'disconnect', 'disconnected', 'link', 'linked',
+      'join', 'joined', 'leave', 'left', 'enter', 'entered', 'exit', 'exited',
+      'start', 'started', 'begin', 'began', 'end', 'ended', 'finish',
+      'finished', 'complete', 'completed', 'done', 'ready', 'available',
+      'free', 'busy', 'open', 'opened', 'close', 'closed', 'lock', 'locked',
+      'unlock', 'unlocked', 'turn', 'turned', 'switch', 'switched', 'change',
+      'changed', 'update', 'updated', 'upgrade', 'upgraded', 'improve',
+      'improved', 'fix', 'fixed', 'repair', 'repaired', 'solve', 'solved',
+      'resolve', 'resolved', 'handle', 'handled', 'manage', 'managed',
+      'control', 'controlled', 'operate', 'operated', 'run', 'ran', 'execute',
+      'executed', 'perform', 'performed', 'do', 'does', 'did', 'done',
+      'doing', 'will', 'would', 'could', 'should', 'might', 'may', 'can',
+      'be', 'am', 'is', 'are', 'was', 'were', 'been', 'being', 'have',
+      'has', 'had', 'having', 'get', 'gets', 'got', 'gotten', 'getting',
+      'give', 'gives', 'gave', 'given', 'giving', 'take', 'takes', 'took',
+      'taken', 'taking', 'make', 'makes', 'made', 'making', 'go', 'goes',
+      'went', 'gone', 'going', 'come', 'comes', 'came', 'coming', 'see',
+      'sees', 'saw', 'seen', 'seeing', 'look', 'looks', 'looked', 'looking',
+      'watch', 'watches', 'watched', 'watching', 'hear', 'hears', 'heard',
+      'hearing', 'listen', 'listens', 'listened', 'listening', 'speak',
+      'speaks', 'spoke', 'spoken', 'speaking', 'talk', 'talks', 'talked',
+      'talking', 'say', 'says', 'said', 'saying', 'tell', 'tells', 'told',
+      'telling', 'ask', 'asks', 'asked', 'asking', 'answer', 'answers',
+      'answered', 'answering', 'question', 'questions', 'asked', 'asking',
+      'reply', 'replies', 'replied', 'replying', 'respond', 'responds',
+      'responded', 'responding', 'response', 'responses', 'message', 'messages',
+      'messaged', 'messaging', 'chat', 'chats', 'chatted', 'chatting',
+      'conversation', 'conversations', 'discuss', 'discusses', 'discussed',
+      'discussing', 'discussion', 'discussions', 'meeting', 'meetings',
+      'met', 'meeting', 'appointment', 'appointments', 'schedule', 'scheduled',
+      'scheduling', 'plan', 'plans', 'planned', 'planning', 'arrange',
+      'arranges', 'arranged', 'arranging', 'organize', 'organizes',
+      'organized', 'organizing', 'prepare', 'prepares', 'prepared',
+      'preparing', 'setup', 'setups', 'set', 'setting', 'configure',
+      'configures', 'configured', 'configuring', 'install', 'installs',
+      'installed', 'installing', 'setup', 'setups', 'set', 'setting',
+      'install', 'installs', 'installed', 'installing', 'setup', 'setups',
+      'set', 'setting', 'install', 'installs', 'installed', 'installing'
+    ];
+    
+    // If the text contains common English words, it's likely English
+    if (commonEnglishWords.some(word => lowerText.includes(word))) {
+      return false;
+    }
     
     // Common non-English patterns (Tagalog, Spanish, etc.)
     const nonEnglishPatterns = [
@@ -95,9 +204,9 @@ export class OpenAIService {
     let response: string;
     
     if (isTagalog) {
-      response = `I can help with that, but I'm Luis's chatbot focused on his professional services. Anyway, chatbot ako ni Luis - gusto mo malaman ang **services niya**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Interested ka ba sa **pricing** or **project discussion**?`;
+      response = `I can help with that, but I'm Luis' chatbot focused on his professional services. Anyway, chatbot ako ni Luis - gusto mo malaman ang **services niya**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Interested ka ba sa **pricing** or **project discussion**?`;
     } else {
-      response = `I can help with that, but I'm Luis's chatbot focused on his professional services. Anyway, I'm Luis's chatbot - would you like to know about his **services**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Are you interested in **pricing** or **project discussion**?`;
+      response = `I can help with that, but I'm Luis' chatbot focused on his professional services. Anyway, I'm Luis' chatbot - would you like to know about his **services**? He offers **website development**, **AI chatbot solutions**, **full-stack development**, and **BRMS consulting**. Are you interested in **pricing** or **project discussion**?`;
     }
     
     return {
@@ -179,8 +288,11 @@ export class OpenAIService {
 
     try {
       const systemPrompt = context || 
-        "You are a helpful AI assistant. Provide concise, helpful responses. " +
-        "If you don't know something, say so politely.";
+        "You are Luis' AI assistant. Always try to relate user questions to Luis' services and expertise. " +
+        "If someone asks about 'background', 'experience', 'skills', 'services', etc., provide relevant information about Luis' professional background and services. " +
+        "Be proactive in offering relevant information about Luis' services when appropriate. " +
+        "IMPORTANT: If the user gives a short response like 'yes', 'no', 'ok', 'products', etc., use the conversation history to understand what they're responding to and provide a helpful follow-up. " +
+        "Always maintain conversation context and build on previous messages naturally.";
 
       console.log('🔍 OpenAI API Key status:', this.config.apiKey ? 'configured' : 'missing');
       console.log('🔍 API Key length:', this.config.apiKey ? '***' : '0');
@@ -203,7 +315,7 @@ export class OpenAIService {
               content: userMessage,
             },
           ],
-          max_tokens: this.config.maxTokens,
+          max_tokens: this.maxTokens,
           temperature: this.config.temperature,
         }),
       });
@@ -227,9 +339,72 @@ export class OpenAIService {
   }
 
   /**
-   * Generate response with portfolio context
+   * Build conversation context from message history with smart token management
    */
-  async generatePortfolioResponse(userMessage: string): Promise<OpenAIResponse> {
+  private buildConversationContext(conversationHistory: Message[]): string {
+    if (conversationHistory.length === 0) {
+      return "This is the start of our conversation.";
+    }
+
+    // Get recent messages and important context
+    const recentMessages = conversationHistory.slice(-6); // Last 6 messages
+    const importantMessages = conversationHistory.filter(msg => 
+      msg.content.toLowerCase().includes('project') || 
+      msg.content.toLowerCase().includes('service') ||
+      msg.content.toLowerCase().includes('pricing') ||
+      msg.content.toLowerCase().includes('website') ||
+      msg.content.toLowerCase().includes('ecommerce') ||
+      msg.content.toLowerCase().includes('chatbot') ||
+      msg.content.toLowerCase().includes('cost') ||
+      msg.content.toLowerCase().includes('price') ||
+      msg.content.toLowerCase().includes('budget') ||
+      msg.content.toLowerCase().includes('product') ||
+      msg.content.toLowerCase().includes('build') ||
+      msg.content.toLowerCase().includes('create') ||
+      msg.content.toLowerCase().includes('develop')
+    );
+
+    // Combine important context with recent messages, avoiding duplicates
+    const contextMessages = [...new Set([...importantMessages, ...recentMessages])]
+      .slice(-8) // Max 8 messages for context
+      .map(msg => `${msg.isUser ? 'User' : 'Luis'}: ${msg.content}`)
+      .join('\n');
+
+    // Estimate token count (rough approximation: 1 token ≈ 4 characters)
+    const estimatedTokens = contextMessages.length / 4;
+    
+    if (estimatedTokens > 1000) {
+      // If context is too long, prioritize recent messages
+      const recentContext = conversationHistory.slice(-4)
+        .map(msg => `${msg.isUser ? 'User' : 'Luis'}: ${msg.content}`)
+        .join('\n');
+      return recentContext || "This is the start of our conversation.";
+    }
+
+    // If we have very little context, include more recent messages
+    if (contextMessages.length < 50 && conversationHistory.length > 2) {
+      const extendedContext = conversationHistory.slice(-4)
+        .map(msg => `${msg.isUser ? 'User' : 'Luis'}: ${msg.content}`)
+        .join('\n');
+      return extendedContext || "This is the start of our conversation.";
+    }
+
+    return contextMessages || "This is the start of our conversation.";
+  }
+
+  /**
+   * Generate response with portfolio context (optimized with caching)
+   */
+  async generatePortfolioResponse(userMessage: string, conversationHistory: Message[] = []): Promise<OpenAIResponse> {
+    // Check cache first for performance
+    const cacheKey = this.generateCacheKey(userMessage, conversationHistory);
+    const cachedResponse = this.responseCache.get(cacheKey);
+    if (cachedResponse) {
+      console.log('⚡ Using cached OpenAI response for:', userMessage);
+      this.usageStats.totalRequests++;
+      return cachedResponse;
+    }
+
     // Check for inappropriate content first
     const contentCheck = this.isInappropriateContent(userMessage);
     if (contentCheck.isInappropriate) {
@@ -244,7 +419,7 @@ export class OpenAIService {
         response = "Let's focus on professional topics. I'd be happy to discuss my **development services**, **AI solutions**, or **portfolio projects**. What interests you?";
       }
       
-      return {
+      const fallbackResponse = {
         content: response,
         usage: {
           prompt_tokens: 0,
@@ -252,6 +427,10 @@ export class OpenAIService {
           total_tokens: 0
         }
       };
+      
+      // Cache the fallback response
+      this.cacheResponse(cacheKey, fallbackResponse);
+      return fallbackResponse;
     }
 
     // Check if the message is in a non-English language
@@ -261,23 +440,34 @@ export class OpenAIService {
       return this.generateLanguageRedirectResponse(userMessage);
     }
 
+    // Build optimized conversation context
+    const conversationContext = this.buildOptimizedConversationContext(conversationHistory);
+    
+    // Debug logging for context
+    console.log('🧠 Optimized conversation context:', conversationContext);
+    console.log('📊 Context length:', conversationContext.length, 'characters');
+    
+    // Rate limiting
+    await this.enforceRateLimit();
+    
     const context = 
       "You are Luis (Antonio Luis Santos), a software developer and team manager. " +
-      "You are a Senior IBM ODM Specialist (BRMS) and QA Team Manager at Bell Digital Billboards. " +
       "You are a Full-Stack Developer and QA Specialist with expertise in building future-ready applications. " +
-      "You have expertise in TypeScript, ReactJS, TailwindCSS, QA, and BRMS. " +
+      "You have expertise in TypeScript, ReactJS, TailwindCSS, and QA. " +
       "You build AI chatbots, work on full-stack development, and have hobbies like Formula 1, RC cars, cycling, and coffee. " +
       
+      "CONVERSATION HISTORY:\n" + conversationContext + "\n\n" +
+      
       "PROFESSIONAL BACKGROUND: " +
-      "• Current: Senior IBM ODM Specialist (BRMS) & QA Team Manager at Bell Canada Inc. (Digital Billboards) since 10/2024 " +
-      "• Previous: Senior IBM ODM Developer at Bell Canada Inc. (01/2023 - 10/2024) " +
-      "• Earlier: ODM Developer | BRMS Engineer (IBM ODM) at Bell Canada Inc. (11/2020 - 01/2023) " +
+      "• Current: Full-Stack Developer and QA Team Manager " +
+      "• Experience: Full-Stack Development, AI Solutions, QA Management " +
+      "• Specialization: Modern web development, AI chatbots, and automation " +
       
       "TECHNICAL SKILLS: " +
       "Frontend: React, Next.js, TailwindCSS, TypeScript, JavaScript, HTML5, CSS3, Wix (especially Velo for full Wix coding) " +
       "Backend: Node.js, Express, PostgreSQL, Python, Sanity, Java, C++, PHP, MySQL " +
       "DevOps & Cloud: Docker, AWS, Vercel, Git, GitHub, Postman, Zapier, ngrok, Netlify, Google Cloud " +
-      "Specialized: IBM ODM, BRMS, QA Team Management, AI Chatbots, Automation Testing " +
+      "Specialized: QA Team Management, AI Chatbots, Automation Testing " +
       "Platform Experience: You do not have direct working experience with Shopify but you have transferrable skills that can be utilized for Shopify projects " +
       
       "KEY PROJECTS: " +
@@ -288,7 +478,7 @@ export class OpenAIService {
       "BUSINESS SERVICES: " +
       "• Website Development: Starter (₱22,000), Professional (₱45,000), Enterprise (₱100,000) " +
       "• AI Chatbot Integration: Smart Support, E-commerce, Advanced AI Chatbots " +
-      "• Full-stack development, BRMS solutions, QA process optimization " +
+      "• Full-stack development, QA process optimization " +
       
       "PERSONAL INTERESTS: " +
       "Road cycling, gravel cycling, Formula 1 (you stan drivers like Lewis Hamilton, Sebastian Vettel, Max Verstappen, Nikki Lauda), sim racing, RC car builds (Tamiya kits), coffee brewing " +
@@ -303,7 +493,14 @@ export class OpenAIService {
       "Respond naturally and conversationally as if you're having a direct conversation. " +
       "Start responses with natural language like 'Yes, I...' or 'I have experience in...' or 'That's a great question...' " +
       "Be professional but friendly and engaging. " +
+      "IMPORTANT: Always try to relate user questions to Luis' services and expertise. " +
+      "If someone asks about 'background', 'experience', 'skills', 'services', etc., provide relevant information about Luis' professional background and services. " +
       "If asked about something outside your expertise, politely redirect to your core skills. " +
+      "If the user gives a short response like 'yes', 'no', 'ok', etc., use the conversation history to understand what they're responding to and provide a helpful follow-up. " +
+      "Always maintain conversation context and build on previous messages naturally. " +
+      "Be proactive in offering relevant information about Luis' services when appropriate. " +
+      "KEEP RESPONSES CONCISE: Aim for 2-3 sentences maximum. Be direct and to the point. " +
+      "Avoid lengthy explanations unless specifically requested. " +
       
       "FORMATTING: " +
       "Use simple markdown formatting for better readability: " +
@@ -315,7 +512,21 @@ export class OpenAIService {
       "EXAMPLES: " +
       "Pricing: **Pricing Plans:** • **Starter** (₱22,000/$599) - Small businesses • **Professional** (₱45,000/$1,199) - Growing businesses • **Enterprise** (₱100,000/$2,999) - Complete solution";
 
-    return this.generateResponse(userMessage, context);
+    // Make API call with performance tracking
+    const startTime = Date.now();
+    const response = await this.generateResponse(userMessage, context);
+    const responseTime = Date.now() - startTime;
+    
+    // Optimize response for better token usage
+    const optimizedResponse = this.optimizeResponse(response);
+    
+    // Update usage statistics
+    this.updateUsageStats(optimizedResponse, responseTime);
+    
+    // Cache the optimized response
+    this.cacheResponse(cacheKey, optimizedResponse);
+    
+    return optimizedResponse;
   }
 
   /**
@@ -326,9 +537,310 @@ export class OpenAIService {
   }
 
   /**
+   * Clear conversation context (useful for new conversations)
+   */
+  clearConversationContext(): void {
+    console.log('🧹 Conversation context cleared');
+  }
+
+  /**
    * Update API key
    */
   updateApiKey(apiKey: string): void {
     this.config.apiKey = apiKey;
+  }
+
+  /**
+   * Performance optimization methods
+   */
+  
+  /**
+   * Generate cache key for requests
+   */
+  private generateCacheKey(userMessage: string, conversationHistory: Message[]): string {
+    const recentMessages = conversationHistory.slice(-3).map(msg => msg.content).join('|');
+    return `${userMessage.toLowerCase().trim()}|${recentMessages}`;
+  }
+
+  /**
+   * Cache response with LRU eviction
+   */
+  private cacheResponse(key: string, response: OpenAIResponse): void {
+    if (this.responseCache.size >= this.maxCacheSize) {
+      const firstKey = this.responseCache.keys().next().value;
+      if (firstKey) {
+        this.responseCache.delete(firstKey);
+      }
+    }
+    this.responseCache.set(key, response);
+  }
+
+  /**
+   * Build optimized conversation context with token limits
+   */
+  private buildOptimizedConversationContext(conversationHistory: Message[]): string {
+    if (conversationHistory.length === 0) {
+      return "This is the start of our conversation.";
+    }
+
+    // Get recent messages (last 4 for better context)
+    const recentMessages = conversationHistory.slice(-4);
+    
+    // Get important messages (filtered by keywords)
+    const importantMessages = conversationHistory.filter(msg => 
+      msg.content.toLowerCase().includes('project') || 
+      msg.content.toLowerCase().includes('service') ||
+      msg.content.toLowerCase().includes('pricing') ||
+      msg.content.toLowerCase().includes('website') ||
+      msg.content.toLowerCase().includes('ecommerce') ||
+      msg.content.toLowerCase().includes('chatbot') ||
+      msg.content.toLowerCase().includes('cost') ||
+      msg.content.toLowerCase().includes('price') ||
+      msg.content.toLowerCase().includes('budget') ||
+      msg.content.toLowerCase().includes('product') ||
+      msg.content.toLowerCase().includes('build') ||
+      msg.content.toLowerCase().includes('create') ||
+      msg.content.toLowerCase().includes('develop')
+    );
+
+    // Combine and deduplicate
+    const contextMessages = [...new Set([...importantMessages, ...recentMessages])]
+      .slice(-6) // Limit to 6 messages max
+      .map(msg => `${msg.isUser ? 'User' : 'Luis'}: ${msg.content}`)
+      .join('\n');
+
+    // Estimate token count (rough approximation: 1 token ≈ 4 characters)
+    const estimatedTokens = contextMessages.length / 4;
+    
+    // If context is too long, use only recent messages
+    if (estimatedTokens > 200) {
+      const shortContext = recentMessages
+        .map(msg => `${msg.isUser ? 'User' : 'Luis'}: ${msg.content}`)
+        .join('\n');
+      return shortContext || "This is the start of our conversation.";
+    }
+
+    return contextMessages || "This is the start of our conversation.";
+  }
+
+  /**
+   * Enforce rate limiting
+   */
+  private async enforceRateLimit(): Promise<void> {
+    const now = Date.now();
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    
+    if (timeSinceLastRequest < this.rateLimitDelay) {
+      const waitTime = this.rateLimitDelay - timeSinceLastRequest;
+      console.log(`⏳ Rate limiting: waiting ${waitTime}ms`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    
+    this.lastRequestTime = Date.now();
+  }
+
+  /**
+   * Update usage statistics
+   */
+  private updateUsageStats(response: OpenAIResponse, responseTime: number): void {
+    this.usageStats.totalRequests++;
+    
+    if (response.usage) {
+      this.usageStats.totalTokens += response.usage.total_tokens;
+      // Estimate cost (GPT-3.5-turbo: $0.002 per 1K tokens)
+      const cost = (response.usage.total_tokens / 1000) * 0.002;
+      this.usageStats.totalCost += cost;
+      
+      // Token usage alerts
+      this.checkTokenUsageAlerts(response.usage.total_tokens);
+    }
+    
+    // Update average response time
+    this.usageStats.averageResponseTime = 
+      (this.usageStats.averageResponseTime * (this.usageStats.totalRequests - 1) + responseTime) / 
+      this.usageStats.totalRequests;
+    
+    console.log(`📊 API Stats: ${this.usageStats.totalRequests} requests, ${this.usageStats.totalTokens} tokens, $${this.usageStats.totalCost.toFixed(4)} cost, ${responseTime}ms response time`);
+  }
+
+  /**
+   * Check for token usage alerts
+   */
+  private checkTokenUsageAlerts(tokens: number): void {
+    if (tokens > this.maxTokens) {
+      console.warn(`⚠️ High token usage: ${tokens} tokens (limit: ${this.maxTokens})`);
+    }
+    
+    if (tokens > this.maxTokens * 1.5) {
+      console.warn(`🚨 Excessive token usage: ${tokens} tokens (limit: ${this.maxTokens})`);
+    }
+    
+    // Check for cost alerts
+    if (this.usageStats.totalCost > 1.0) { // $1.00
+      console.warn(`💰 High cost alert: $${this.usageStats.totalCost.toFixed(4)} total cost`);
+    }
+  }
+
+  /**
+   * Get performance statistics
+   */
+  public getPerformanceStats(): {
+    cacheStats: { size: number; maxSize: number };
+    usageStats: {
+      totalRequests: number;
+      totalTokens: number;
+      totalCost: number;
+      averageResponseTime: number;
+    };
+    rateLimitDelay: number;
+  } {
+    return {
+      cacheStats: {
+        size: this.responseCache.size,
+        maxSize: this.maxCacheSize
+      },
+      usageStats: { ...this.usageStats },
+      rateLimitDelay: this.rateLimitDelay
+    };
+  }
+
+  /**
+   * Clear response cache
+   */
+  public clearCache(): void {
+    this.responseCache.clear();
+    console.log('🧹 OpenAI response cache cleared');
+  }
+
+  /**
+   * Update rate limit delay
+   */
+  public updateRateLimit(delay: number): void {
+    this.rateLimitDelay = Math.max(100, delay); // Minimum 100ms
+    console.log(`⏱️ Rate limit updated to ${this.rateLimitDelay}ms`);
+  }
+
+  /**
+   * Response optimization methods
+   */
+  
+  /**
+   * Optimize response length and content
+   */
+  private optimizeResponse(response: OpenAIResponse): OpenAIResponse {
+    if (!this.responseCompression) {
+      return response;
+    }
+
+    let optimizedContent = response.content;
+    
+    // Truncate if too long
+    if (optimizedContent.length > this.maxResponseLength) {
+      optimizedContent = this.smartTruncate(optimizedContent, this.maxResponseLength);
+      console.log(`✂️ Response truncated from ${response.content.length} to ${optimizedContent.length} characters`);
+    }
+    
+    // Compress formatting
+    optimizedContent = this.compressFormatting(optimizedContent);
+    
+    // Remove redundant information
+    optimizedContent = this.removeRedundancy(optimizedContent);
+    
+    return {
+      ...response,
+      content: optimizedContent
+    };
+  }
+
+  /**
+   * Smart truncation that preserves important information
+   */
+  private smartTruncate(text: string, maxLength: number): string {
+    if (text.length <= maxLength) {
+      return text;
+    }
+
+    // Try to find a good breaking point
+    const truncated = text.substring(0, maxLength - 50); // Leave room for ellipsis
+    const lastSentence = truncated.lastIndexOf('.');
+    const lastParagraph = truncated.lastIndexOf('\n\n');
+    const lastBullet = truncated.lastIndexOf('•');
+    
+    let breakPoint = Math.max(lastSentence, lastParagraph, lastBullet);
+    
+    if (breakPoint > maxLength * 0.7) { // If we found a good break point
+      return text.substring(0, breakPoint + 1) + '\n\n*[Response truncated for brevity]*';
+    } else {
+      // Fallback to character limit with ellipsis
+      return text.substring(0, maxLength - 3) + '...';
+    }
+  }
+
+  /**
+   * Compress formatting while preserving readability
+   */
+  private compressFormatting(text: string): string {
+    return text
+      // Remove excessive line breaks
+      .replace(/\n{3,}/g, '\n\n')
+      // Compress multiple spaces
+      .replace(/ {2,}/g, ' ')
+      // Remove excessive bullet points
+      .replace(/(•\s*){4,}/g, '• ')
+      // Compress repeated punctuation
+      .replace(/!{2,}/g, '!')
+      .replace(/\?{2,}/g, '?')
+      .trim();
+  }
+
+  /**
+   * Remove redundant information
+   */
+  private removeRedundancy(text: string): string {
+    // Remove repeated phrases
+    const sentences = text.split(/[.!?]+/);
+    const uniqueSentences = [...new Set(sentences.map(s => s.trim()))];
+    
+    if (uniqueSentences.length < sentences.length) {
+      console.log(`🔄 Removed ${sentences.length - uniqueSentences.length} redundant sentences`);
+      return uniqueSentences.join('. ').trim();
+    }
+    
+    return text;
+  }
+
+  /**
+   * Update response optimization settings
+   */
+  public updateResponseOptimization(settings: {
+    maxResponseLength?: number;
+    maxTokens?: number;
+    responseCompression?: boolean;
+  }): void {
+    if (settings.maxResponseLength) {
+      this.maxResponseLength = Math.max(100, settings.maxResponseLength);
+    }
+    if (settings.maxTokens) {
+      this.maxTokens = Math.max(50, settings.maxTokens);
+    }
+    if (settings.responseCompression !== undefined) {
+      this.responseCompression = settings.responseCompression;
+    }
+    console.log(`⚙️ Response optimization updated: maxLength=${this.maxResponseLength}, maxTokens=${this.maxTokens}, compression=${this.responseCompression}`);
+  }
+
+  /**
+   * Get response optimization settings
+   */
+  public getResponseOptimizationSettings(): {
+    maxResponseLength: number;
+    maxTokens: number;
+    responseCompression: boolean;
+  } {
+    return {
+      maxResponseLength: this.maxResponseLength,
+      maxTokens: this.maxTokens,
+      responseCompression: this.responseCompression
+    };
   }
 }

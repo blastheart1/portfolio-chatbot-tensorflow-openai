@@ -1,13 +1,13 @@
 # AI Chatbot - Luis Santos Portfolio
 
-A sophisticated, self-improving AI-powered chatbot that demonstrates advanced technical expertise by combining TensorFlow.js for local intent recognition with OpenAI for intelligent conversational AI. This chatbot serves as an interactive portfolio showcasing Luis's professional background, skills, and projects.
+A sophisticated, self-improving AI-powered chatbot that demonstrates advanced technical expertise by combining TensorFlow.js for local intent recognition with OpenAI for intelligent conversational AI. This chatbot serves as an interactive portfolio showcasing Luis' professional background, skills, and projects.
 
 ## 🌟 Features
 
 ### Core Functionality
 - 🤖 **Hybrid AI Architecture**: TensorFlow.js for local intent classification + OpenAI GPT-3.5-turbo for complex queries
 - 🧠 **Self-Improving**: Learns from user interactions and improves responses over time
-- 🎯 **Portfolio-Focused**: Specialized knowledge about Luis's professional background and projects
+- 🎯 **Portfolio-Focused**: Specialized knowledge about Luis' professional background and projects
 - 🔒 **Security-First**: Input validation, rate limiting, and content filtering
 - ⚡ **Performance Optimized**: Client-side processing with intelligent caching
 
@@ -16,7 +16,7 @@ A sophisticated, self-improving AI-powered chatbot that demonstrates advanced te
 - 📱 **Mobile-First**: Optimized for all device sizes and touch interactions
 - 💬 **Conversational**: Natural language processing with context awareness
 - 🔄 **Real-time**: Instant responses with typing indicators and smooth transitions
-- 🎭 **Personality**: Engages users with Luis's professional persona and interests
+- 🎭 **Personality**: Engages users with Luis' professional persona and interests
 
 ### Technical Features
 - 🔧 **Highly Customizable**: Easy to adapt for different use cases (ecommerce, enterprise, etc.)
@@ -86,7 +86,7 @@ The chatbot will be available at `http://localhost:3000`
 
 ### 2. AI Response Generation
 - **Context-Aware**: Maintains conversation context and user history
-- **Personality-Driven**: Responses reflect Luis's professional background
+- **Personality-Driven**: Responses reflect Luis' professional background
 - **Learning Integration**: New interactions improve future responses
 - **Safety First**: All responses validated for security and appropriateness
 
@@ -239,7 +239,7 @@ REACT_APP_CONFIDENCE_THRESHOLD=0.7
 ## 🎯 Use Cases & Adaptations
 
 ### Current Implementation
-- **Portfolio Showcase**: Interactive demonstration of Luis's skills
+- **Portfolio Showcase**: Interactive demonstration of Luis' skills
 - **Professional Q&A**: Detailed information about background and projects
 - **Skill Demonstration**: Technical expertise in AI/ML integration
 

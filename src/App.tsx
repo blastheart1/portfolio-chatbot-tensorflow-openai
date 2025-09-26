@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { Brain, Instagram, Facebook, Linkedin } from 'lucide-react';
 import { Chatbot } from './components/Chatbot';
 import Embed from './pages/Embed';
+import PortfolioEmbed from './pages/PortfolioEmbed';
 import './App.css';
 
 interface ChatbotStatus {
   isModelReady: boolean;
   isLoading: boolean;
-  error: string | null;
   learningCount: number;
   isConfigured: boolean;
 }
@@ -25,7 +25,6 @@ function App() {
   const [chatbotStatus, setChatbotStatus] = useState<ChatbotStatus>({
     isModelReady: false,
     isLoading: true,
-    error: null,
     learningCount: 0,
     isConfigured: false
   });
@@ -34,47 +33,52 @@ function App() {
   if (window.location.pathname === '/embed') {
     return <Embed />;
   }
+  
+  // Check if this is the portfolio embed route
+  if (window.location.pathname === '/portfolio-embed') {
+    return <PortfolioEmbed />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Demo content */}
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 md:py-16">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4 md:mb-6">
             Portfolio Chatbot Demo
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8 px-4">
             A showcase of TensorFlow.js intent recognition and OpenAI integration
           </p>
           
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 md:p-8 mb-6 md:mb-8">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3 md:mb-4">
               About This Demo
             </h2>
-            <p className="text-gray-600 mb-6">
-              This chatbot showcases Luis's AI expertise with a smart two-tier system: a local AI brain that runs 
+            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
+              This chatbot showcases Luis' AI expertise with a smart two-tier system: a local AI brain that runs 
               in your browser for fast responses, and OpenAI's advanced language model for complex questions. 
               It intelligently filters content, generates qualified leads, and learns from conversations while 
               maintaining professional boundaries.
             </p>
             
-            <div className="grid md:grid-cols-2 gap-6 text-left">
-              <div className="bg-blue-50 p-6 rounded-xl">
-                <h3 className="text-lg font-semibold text-blue-800 mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 text-left">
+              <div className="bg-blue-50 p-4 md:p-6 rounded-lg md:rounded-xl">
+                <h3 className="text-base md:text-lg font-semibold text-blue-800 mb-2 md:mb-3">
                   🤖 TensorFlow.js (Local AI Brain)
                 </h3>
-                <div className="text-blue-700 space-y-3">
+                <div className="text-blue-700 space-y-2 md:space-y-3 text-sm md:text-base">
                   <div>
                     <strong>🧠 Smart Neural Network:</strong> 4-layer brain (256→128→64→answers)
                     <div className="text-sm text-blue-600 mt-1">Like having a mini-AI that runs instantly in your browser</div>
                   </div>
                   <div>
                     <strong>📚 Custom Knowledge Base:</strong> 1000+ Luis-specific terms and phrases
-                    <div className="text-sm text-blue-600 mt-1">Trained specifically on Luis's expertise and services</div>
+                    <div className="text-sm text-blue-600 mt-1">Trained specifically on Luis' expertise and services</div>
                   </div>
                   <div>
                     <strong>🎯 Relevance Scoring:</strong> Smart filtering (40% relevance threshold)
-                    <div className="text-sm text-blue-600 mt-1">Only responds to topics actually related to Luis's work</div>
+                    <div className="text-sm text-blue-600 mt-1">Only responds to topics actually related to Luis' work</div>
                   </div>
                   <div>
                     <strong>⚡ Confidence System:</strong> Dynamic accuracy checking (60% confidence threshold)
@@ -95,11 +99,11 @@ function App() {
                 </div>
               </div>
               
-              <div className="bg-purple-50 p-6 rounded-xl">
-                <h3 className="text-lg font-semibold text-purple-800 mb-3">
+              <div className="bg-purple-50 p-4 md:p-6 rounded-lg md:rounded-xl">
+                <h3 className="text-base md:text-lg font-semibold text-purple-800 mb-2 md:mb-3">
                   🧠 OpenAI Integration (Advanced Fallback)
                 </h3>
-                <div className="text-purple-700 space-y-3">
+                <div className="text-purple-700 space-y-2 md:space-y-3 text-sm md:text-base">
                   <div>
                     <strong>🚀 GPT-3.5-turbo:</strong> 150 token responses with Luis context
                     <div className="text-sm text-purple-600 mt-1">Only for complex questions when the local AI needs help</div>
@@ -118,7 +122,7 @@ function App() {
                   </div>
                   <div>
                     <strong>🎯 Smart Fallback:</strong> Only for relevant Luis questions
-                    <div className="text-sm text-purple-600 mt-1">Won't answer random questions - stays focused on Luis's expertise</div>
+                    <div className="text-sm text-purple-600 mt-1">Won't answer random questions - stays focused on Luis' expertise</div>
                   </div>
                   <div>
                     <strong>💰 Cost Optimization:</strong> Zero tokens for filtered content
@@ -132,20 +136,20 @@ function App() {
               </div>
             </div>
             
-            <div className="mt-6 bg-gray-50 p-6 rounded-xl">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            <div className="mt-4 md:mt-6 bg-gray-50 p-4 md:p-6 rounded-lg md:rounded-xl">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                 🔧 How It All Works Together
               </h3>
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-xs md:text-sm">
                 <div>
                   <h4 className="font-semibold text-gray-700 mb-2">🧠 AI/ML Pipeline</h4>
                   <div className="text-gray-600 space-y-2">
                     <div>
                       <strong>Intent Classification:</strong> Understands what you're asking
-                      <div className="text-xs text-gray-500 mt-1">Like a smart translator that knows Luis's business</div>
+                      <div className="text-xs text-gray-500 mt-1">Like a smart translator that knows Luis' business</div>
                     </div>
                     <div>
-                      <strong>Relevance Scoring:</strong> Checks if it's related to Luis's work
+                      <strong>Relevance Scoring:</strong> Checks if it's related to Luis' work
                       <div className="text-xs text-gray-500 mt-1">Won't waste time on random topics</div>
                     </div>
                     <div>
@@ -163,7 +167,7 @@ function App() {
                   <div className="text-gray-600 space-y-2">
                     <div>
                       <strong>Smart Detection:</strong> Spots potential clients automatically
-                      <div className="text-xs text-gray-500 mt-1">Knows when someone's interested in Luis's services</div>
+                      <div className="text-xs text-gray-500 mt-1">Knows when someone's interested in Luis' services</div>
                     </div>
                     <div>
                       <strong>Natural Flow:</strong> Asks politely before collecting info
@@ -204,8 +208,8 @@ function App() {
             </div>
           </div>
           
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+          <div className="bg-white rounded-xl md:rounded-2xl shadow-xl p-4 md:p-8">
+            <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-3 md:mb-4">
               Try the Chatbot
             </h2>
             
@@ -215,10 +219,6 @@ function App() {
                 <div className="flex items-center justify-center space-x-2 text-sm text-blue-600">
                   <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                   <span>Training AI model...</span>
-                </div>
-              ) : chatbotStatus.error ? (
-                <div className="text-sm text-yellow-600">
-                  ⚠️ {chatbotStatus.error}
                 </div>
               ) : (
                 <div className="flex items-center justify-center space-x-2 text-sm text-green-600">
@@ -237,15 +237,15 @@ function App() {
               )}
             </div>
             
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
               Click the chat button in the bottom-right corner to start a conversation. 
-              Ask about Luis's background, skills, services, or hobbies!
+              Ask about Luis' background, skills, services, or hobbies!
             </p>
             
-            <div className="grid md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <strong>Sample Questions:</strong>
-                <ul className="mt-2 space-y-1 text-gray-600">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-xs md:text-sm">
+              <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                <strong className="text-xs md:text-sm">Sample Questions:</strong>
+                <ul className="mt-1 md:mt-2 space-y-1 text-gray-600 text-xs md:text-sm">
                   <li>• "What do you do?"</li>
                   <li>• "Tell me about your skills"</li>
                   <li>• "Do you build chatbots?"</li>
@@ -253,9 +253,9 @@ function App() {
                 </ul>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <strong>FAQ Categories:</strong>
-                <ul className="mt-2 space-y-1 text-gray-600">
+              <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                <strong className="text-xs md:text-sm">FAQ Categories:</strong>
+                <ul className="mt-1 md:mt-2 space-y-1 text-gray-600 text-xs md:text-sm">
                   <li>• About & Background</li>
                   <li>• Services & Projects</li>
                   <li>• Skills & Technologies</li>
@@ -263,9 +263,9 @@ function App() {
                 </ul>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <strong>Technical Features:</strong>
-                <ul className="mt-2 space-y-1 text-gray-600">
+              <div className="bg-gray-50 p-3 md:p-4 rounded-lg">
+                <strong className="text-xs md:text-sm">Technical Features:</strong>
+                <ul className="mt-1 md:mt-2 space-y-1 text-gray-600 text-xs md:text-sm">
                   <li>• Lead generation system</li>
                   <li>• Content filtering & safety</li>
                   <li>• Real-time confidence scoring</li>
@@ -287,8 +287,8 @@ function App() {
       />
       
       {/* Footer */}
-      <footer className="w-full mt-6 py-6 flex flex-col items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-        <p>
+      <footer className="w-full mt-4 md:mt-6 py-4 md:py-6 flex flex-col items-center gap-3 md:gap-4 text-xs md:text-sm text-gray-600 dark:text-gray-300 px-4">
+        <p className="text-center">
           Developed by{" "}
           <a
             href="https://my-portfolio-jusu.vercel.app/"
@@ -300,7 +300,7 @@ function App() {
           </a>
         </p>
 
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-1 md:gap-2">
           {techStacks.map((tech) => (
             <span
               key={tech}
@@ -311,30 +311,33 @@ function App() {
           ))}
         </div>
 
-        <div className="flex items-center gap-4 mt-2">
+        <div className="flex items-center gap-3 md:gap-4 mt-1 md:mt-2">
           <a
             href="https://www.instagram.com/0xlv1s_"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:text-pink-600 transition-colors p-2"
+            aria-label="Instagram"
           >
-            <Instagram className="w-5 h-5" />
+            <Instagram className="w-4 h-4 md:w-5 md:h-5" />
           </a>
           <a
             href="https://www.facebook.com/AntonioLuisASantos"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:text-blue-600 transition-colors p-2"
+            aria-label="Facebook"
           >
-            <Facebook className="w-5 h-5" />
+            <Facebook className="w-4 h-4 md:w-5 md:h-5" />
           </a>
           <a
             href="https://www.linkedin.com/in/alasantos01/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-600 dark:text-gray-300 hover:text-blue-700 transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:text-blue-700 transition-colors p-2"
+            aria-label="LinkedIn"
           >
-            <Linkedin className="w-5 h-5" />
+            <Linkedin className="w-4 h-4 md:w-5 md:h-5" />
           </a>
         </div>
       </footer>

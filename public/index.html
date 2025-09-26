@@ -8,7 +8,7 @@
     
     <!-- SEO Meta Tags -->
     <title>Luis | AI Chatbot Portfolio</title>
-    <meta name="description" content="Interactive AI chatbot showcasing Luis's technical expertise with TensorFlow.js, OpenAI integration, and modern web development skills." />
+    <meta name="description" content="Interactive AI chatbot showcasing Luis' technical expertise with TensorFlow.js, OpenAI integration, and modern web development skills." />
     <meta name="keywords" content="AI chatbot, TensorFlow.js, OpenAI, React, TypeScript, portfolio, Luis Santos, web development" />
     <meta name="author" content="Luis Santos" />
     
@@ -39,6 +39,14 @@
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Luis Chatbot" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    <meta name="msapplication-tap-highlight" content="no" />
   </head>
   <body>
     <noscript>
@@ -51,5 +59,20 @@
       </div>
     </noscript>
     <div id="root"></div>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

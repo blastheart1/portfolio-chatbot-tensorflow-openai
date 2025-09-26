@@ -2,7 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
-import { TensorFlowService } from '../lib/tensorflowModel';
+import { PerformanceMonitor } from './PerformanceMonitor';
+import { PerformanceToggle } from './PerformanceToggle';
+import TensorFlowService from '../lib/tensorflowModel';
 import { OpenAIService } from '../lib/openaiService';
 
 interface ChatbotProps {
@@ -11,7 +13,6 @@ interface ChatbotProps {
   onStatusChange?: (status: {
     isModelReady: boolean;
     isLoading: boolean;
-    error: string | null;
     learningCount: number;
     isConfigured: boolean;
   }) => void;
@@ -25,8 +26,9 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isModelReady, setIsModelReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [learningCount, setLearningCount] = useState(0);
+  const [performanceStats, setPerformanceStats] = useState<any>(null);
+  const [showPerformanceMonitor, setShowPerformanceMonitor] = useState(false);
 
   // Initialize services
   const tensorflowService = useMemo(() => new TensorFlowService(confidenceThreshold), [confidenceThreshold]);
@@ -56,19 +58,25 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       onStatusChange({
         isModelReady,
         isLoading,
-        error,
         learningCount,
         isConfigured: openaiService.isConfigured()
       });
     }
-  }, [isModelReady, isLoading, error, learningCount, openaiService, onStatusChange]);
+  }, [isModelReady, isLoading, learningCount, openaiService, onStatusChange]);
 
   // Initialize TensorFlow.js model
   useEffect(() => {
     const initializeModel = async () => {
       try {
         setIsLoading(true);
-        setError(null);
+        
+        // Prevent multiple initializations in development
+        if (process.env.NODE_ENV === 'development' && tensorflowService.isModelReady()) {
+          console.log('🔄 Development mode: Model already ready, skipping initialization');
+          setIsModelReady(true);
+          setIsLoading(false);
+          return;
+        }
 
         // Try to load existing model
         const modelLoaded = await tensorflowService.loadModel();
@@ -89,9 +97,21 @@ export const Chatbot: React.FC<ChatbotProps> = ({
           setLearningCount(parseInt(storedCount));
         }
 
+        // Get performance stats
+        const tensorflowStats = tensorflowService.getPerformanceStats();
+        const openaiStats = openaiService.getPerformanceStats();
+        const combinedStats = {
+          tensorflow: tensorflowStats,
+          openai: openaiStats
+        };
+        setPerformanceStats(combinedStats);
+        console.log('📊 Performance Stats:', combinedStats);
+        
+        // Performance monitor is hidden by default, can be toggled
+        setShowPerformanceMonitor(false);
+
       } catch (err) {
         console.error('❌ Error initializing model:', err);
-        setError('Failed to initialize AI model. Using simple keyword matching instead.');
         // Set model as ready even if training failed, so we can use simple matching
         setIsModelReady(true);
       } finally {
@@ -100,10 +120,23 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     };
 
     initializeModel();
-  }, [tensorflowService]);
+  }, [tensorflowService, openaiService]);
+
+  // Cleanup on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (tensorflowService) {
+        tensorflowService.cleanup();
+      }
+    };
+  }, [tensorflowService, openaiService]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
+  };
+
+  const togglePerformanceMonitor = () => {
+    setShowPerformanceMonitor(!showPerformanceMonitor);
   };
 
   const handleLearningExample = async (userInput: string, openAiResponse: string): Promise<{success: boolean, reason?: string}> => {
@@ -131,9 +164,9 @@ export const Chatbot: React.FC<ChatbotProps> = ({
         src="/LuisBot.png"
         alt="Luis AI Chatbot"
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 w-20 h-20 cursor-pointer z-40 object-cover"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-16 h-16 md:w-20 md:h-20 cursor-pointer z-40 object-cover rounded-full shadow-lg border-2 border-white"
         whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.98 }}
+        whileTap={{ scale: 0.95 }}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ 
@@ -170,32 +203,20 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       />
 
 
-      {/* Loading indicator */}
-      {isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed bottom-20 right-6 bg-white rounded-lg shadow-lg p-3 border border-gray-200 z-30"
-        >
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <span>Training AI model...</span>
-          </div>
-        </motion.div>
-      )}
 
-      {/* Error indicator */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-20 right-6 bg-yellow-50 border border-yellow-200 rounded-lg shadow-lg p-3 z-30 max-w-xs"
-        >
-          <div className="text-sm text-yellow-800">
-            ⚠️ {error}
-          </div>
-        </motion.div>
-      )}
+
+      {/* Performance Toggle Button */}
+      <PerformanceToggle 
+        onClick={togglePerformanceMonitor}
+        isVisible={showPerformanceMonitor}
+      />
+
+      {/* Performance Monitor */}
+      <PerformanceMonitor 
+        stats={performanceStats} 
+        isVisible={showPerformanceMonitor}
+        onToggle={togglePerformanceMonitor}
+      />
 
 
       {/* Chat Window */}

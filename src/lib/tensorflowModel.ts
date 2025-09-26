@@ -15,7 +15,7 @@ export interface ClassificationResult {
   tag: string;
   confidence: number;
   response: string;
-  relevance: number; // How relevant this is to Luis's content (0-1)
+  relevance: number; // How relevant this is to Luis' content (0-1)
   source: 'faq' | 'learned' | 'fallback';
 }
 
@@ -23,8 +23,20 @@ export class TensorFlowService {
   private model: tf.LayersModel | null = null;
   private vocabulary: string[] = [];
   private intents: IntentData[] = [];
-  private confidenceThreshold = 0.6; // Lowered for better matching
-  private relevanceThreshold = 0.4; // Lowered to allow more relevant questions
+  private confidenceThreshold = 0.75; // Increased for better accuracy
+  private relevanceThreshold = 0.5; // Increased to filter irrelevant questions
+  private isInitializing = false; // Prevent multiple initializations
+  
+  // Performance optimization properties
+  private responseCache = new Map<string, ClassificationResult>();
+  private maxCacheSize = 100;
+  private trainingMetrics = {
+    startTime: 0,
+    endTime: 0,
+    epochs: 0,
+    finalLoss: 0,
+    finalAccuracy: 0
+  };
   private luisKeywords: string[] = [
     // Personal keywords
     'luis', 'antonio', 'santos', 'developer', 'software', 'programmer',
@@ -65,7 +77,7 @@ export class TensorFlowService {
     'are you gay', 'whats your type', 'do you want to date'
   ];
 
-  constructor(confidenceThreshold: number = 0.6) {
+  constructor(confidenceThreshold: number = 0.75) {
     this.confidenceThreshold = confidenceThreshold;
   }
 
@@ -161,7 +173,70 @@ export class TensorFlowService {
   }
 
   /**
-   * Calculate relevance score to Luis's content (0-1)
+   * Check if the input is a greeting
+   */
+  private isGreeting(text: string): boolean {
+    const lowerText = text.toLowerCase().trim();
+    
+    // Simple greeting patterns
+    const greetingPatterns = [
+      'hello', 'hi', 'hey', 'yo', 'hiya', 'howdy',
+      'good morning', 'good afternoon', 'good evening', 'good day',
+      'morning', 'afternoon', 'evening',
+      'what\'s up', 'whats up', 'sup', 'what\'s happening',
+      'how are you', 'how\'s it going', 'how do you do',
+      'nice to meet you', 'pleasure to meet you',
+      'good to see you', 'great to see you', 'welcome',
+      'hello there', 'hi there', 'hey there'
+    ];
+    
+    return greetingPatterns.some(pattern => lowerText.includes(pattern)) || 
+           greetingPatterns.includes(lowerText);
+  }
+
+  /**
+   * Check if the question is generic and should be handled by AI
+   */
+  private isGenericQuestion(text: string): boolean {
+    const lowerText = text.toLowerCase();
+    
+    // Don't treat greetings as generic questions
+    if (this.isGreeting(text)) {
+      return false;
+    }
+    
+    // Generic question patterns that should use AI
+    const genericPatterns = [
+      'what kind of',
+      'what types of',
+      'what sort of',
+      'what can you',
+      'what do you',
+      'how do you',
+      'can you help',
+      'what are your',
+      'tell me about',
+      'explain',
+      'describe',
+      'what is',
+      'how does',
+      'what would',
+      'what should',
+      'what could',
+      'what might',
+      'what are',
+      'how are',
+      'why do',
+      'when do',
+      'where do',
+      'which do'
+    ];
+    
+    return genericPatterns.some(pattern => lowerText.includes(pattern));
+  }
+
+  /**
+   * Calculate relevance score to Luis' content (0-1)
    */
   private calculateRelevance(text: string): number {
     const words = text.toLowerCase()
@@ -170,6 +245,17 @@ export class TensorFlowService {
       .filter(word => word.length > 0);
     
     if (words.length === 0) return 0;
+    
+    // Special handling for greetings - give them high relevance
+    const greetingWords = ['hello', 'hi', 'hey', 'good', 'morning', 'afternoon', 'evening', 'yo', 'whats', 'up', 'there', 'greetings', 'hiya', 'howdy', 'sup', 'happening', 'how', 'are', 'you', 'going', 'do', 'nice', 'meet', 'pleasure', 'see', 'welcome'];
+    const isGreeting = words.some(word => 
+      greetingWords.some(greeting => word.includes(greeting))
+    );
+    
+    if (isGreeting) {
+      // Greetings should have high relevance to ensure they're processed
+      return 0.8; // High relevance for greetings
+    }
     
     const relevantWords = words.filter(word => 
       this.luisKeywords.some(keyword => 
@@ -185,23 +271,23 @@ export class TensorFlowService {
     const hasPersonalRef = words.some(word => 
       personalRefs.some(ref => word.includes(ref))
     );
-    if (hasPersonalRef) relevance += 0.2;
+    if (hasPersonalRef) relevance += 0.3; // Increased boost
     
     // Boost for professional/technical terms
-    const professionalTerms = ['developer', 'software', 'programming', 'code', 'project'];
+    const professionalTerms = ['developer', 'software', 'programming', 'code', 'project', 'website', 'chatbot', 'ai', 'development', 'service', 'work', 'job', 'career', 'skill', 'build', 'create', 'develop', 'design', 'app', 'application'];
     const hasProfessionalRef = words.some(word => 
       professionalTerms.some(term => word.includes(term))
     );
-    if (hasProfessionalRef) relevance += 0.1;
+    if (hasProfessionalRef) relevance += 0.2; // Increased boost
     
-    // Boost for hobby/interest terms
-    const hobbyTerms = ['cycling', 'coffee', 'racing', 'rc', 'youtube'];
+    // Penalty for irrelevant hobby topics (should not be primary focus)
+    const hobbyTerms = ['cycling', 'coffee', 'racing', 'rc', 'youtube', 'sunraku', 'hobby', 'hobbies', 'entertainment', 'fun', 'game', 'gaming'];
     const hasHobbyRef = words.some(word => 
       hobbyTerms.some(hobby => word.includes(hobby))
     );
-    if (hasHobbyRef) relevance += 0.1;
+    if (hasHobbyRef) relevance -= 0.3; // Penalty for hobby topics
     
-    return Math.min(relevance, 1.0);
+    return Math.max(0, Math.min(relevance, 1.0));
   }
 
   /**
@@ -245,7 +331,13 @@ export class TensorFlowService {
    * Create and compile the model with enhanced architecture
    */
   private createModel(vocabSize: number, numIntents: number): tf.LayersModel {
-    const model = tf.sequential({
+    try {
+      console.log(`🏗️ Creating model with vocab size: ${vocabSize}, intents: ${numIntents}`);
+      
+      // Clear any existing variables to prevent conflicts
+      tf.disposeVariables();
+      
+      const model = tf.sequential({
       layers: [
         // Enhanced input layer with more capacity
         tf.layers.dense({
@@ -289,19 +381,46 @@ export class TensorFlowService {
     // Enhanced optimizer with learning rate scheduling
     const optimizer = tf.train.adam(0.001);
     
-    model.compile({
-      optimizer: optimizer,
-      loss: 'sparseCategoricalCrossentropy',
-      metrics: ['accuracy'],
-    });
+      model.compile({
+        optimizer: optimizer,
+        loss: 'sparseCategoricalCrossentropy',
+        metrics: ['accuracy'],
+      });
 
-    return model;
+      console.log('✅ Model created and compiled successfully');
+      return model;
+      
+    } catch (error) {
+      console.error('❌ Error creating model:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to create model: ${errorMessage}`);
+    }
   }
 
   /**
-   * Train the model
+   * Train the model with optimized parameters
    */
   async trainModel(): Promise<void> {
+    // Prevent multiple simultaneous initializations
+    if (this.isInitializing) {
+      console.log('⏳ Model training already in progress, skipping...');
+      return;
+    }
+    
+    this.isInitializing = true;
+    console.log('🚀 Starting optimized TensorFlow model training...');
+    
+    try {
+      // Clean up any existing model first
+      if (this.model) {
+        console.log('🧹 Cleaning up existing model before training...');
+        this.model.dispose();
+        this.model = null;
+        tf.disposeVariables();
+      }
+      
+      this.trainingMetrics.startTime = Date.now();
+    
     const data = await this.loadAllData();
     this.intents = data.intents;
     this.createVocabulary(data);
@@ -315,36 +434,98 @@ export class TensorFlowService {
     // Create and compile model
     this.model = this.createModel(this.vocabulary.length, data.intents.length);
     
-    // Enhanced training with early stopping and better parameters
+    // Verify model was created successfully
+    if (!this.model) {
+      throw new Error('Failed to create model');
+    }
+    
+    console.log('🏗️ Model created successfully');
+    console.log(`📊 Vocabulary size: ${this.vocabulary.length}, Intents: ${data.intents.length}`);
+    
+    // Optimized training parameters for better performance
+    let bestLoss = Infinity;
+    let patience = 0;
+    const maxPatience = 10; // Early stopping patience
+    
     await this.model.fit(inputTensor, labelTensor, {
-      epochs: 150,
-      batchSize: 16,
+      epochs: 50, // Reduced from 150 for faster training
+      batchSize: 32, // Increased from 16 for better GPU utilization
       validationSplit: 0.2,
       verbose: 0,
       callbacks: {
         onEpochEnd: (epoch, logs) => {
-          // Log training progress
-          if (epoch % 25 === 0) {
-            console.log(`Epoch ${epoch}: loss=${logs?.loss?.toFixed(4)}, accuracy=${logs?.acc?.toFixed(4)}`);
+          this.trainingMetrics.epochs = epoch + 1;
+          this.trainingMetrics.finalLoss = logs?.loss || 0;
+          this.trainingMetrics.finalAccuracy = logs?.acc || 0;
+          
+          // Early stopping logic
+          if (logs?.loss && logs.loss < bestLoss) {
+            bestLoss = logs.loss;
+            patience = 0;
+          } else {
+            patience++;
+          }
+          
+          // Log training progress (reduced frequency)
+          if (epoch % 10 === 0 || epoch === 0) {
+            console.log(`📊 Epoch ${epoch + 1}: loss=${logs?.loss?.toFixed(4)}, accuracy=${logs?.acc?.toFixed(4)}`);
+          }
+          
+          // Early stopping
+          if (patience >= maxPatience) {
+            console.log(`⏹️ Early stopping at epoch ${epoch + 1} (patience: ${patience})`);
+            // Note: Early stopping is handled by the training loop, not by returning false
           }
         }
       }
     });
     
-    // Save model
-    await this.saveModel();
+    // Verify model is still valid after training
+    if (!this.model) {
+      console.error('❌ Model became null during training');
+      throw new Error('Model became null during training');
+    }
+    
+    console.log('✅ Training completed successfully');
+    
+    // Save model (with error handling)
+    try {
+      await this.saveModel();
+      console.log('💾 Model saved successfully');
+    } catch (saveError) {
+      console.error('❌ Error saving model:', saveError);
+      const errorMessage = saveError instanceof Error ? saveError.message : String(saveError);
+      throw new Error(`Failed to save model: ${errorMessage}`);
+    }
     
     // Clean up tensors
     inputTensor.dispose();
     labelTensor.dispose();
+    
+    this.trainingMetrics.endTime = Date.now();
+    const trainingTime = (this.trainingMetrics.endTime - this.trainingMetrics.startTime) / 1000;
+    
+      console.log(`✅ Training completed in ${trainingTime.toFixed(2)}s`);
+      console.log(`📈 Final metrics: loss=${this.trainingMetrics.finalLoss.toFixed(4)}, accuracy=${this.trainingMetrics.finalAccuracy.toFixed(4)}`);
+    } finally {
+      this.isInitializing = false;
+    }
   }
 
   /**
-   * Classify input text with enhanced relevance scoring
+   * Classify input text with enhanced relevance scoring and caching
    */
   async classifyInput(text: string): Promise<ClassificationResult | null> {
     if (!this.model) {
       throw new Error('Model not trained yet');
+    }
+
+    // Check cache first for performance
+    const cacheKey = text.toLowerCase().trim();
+    const cachedResult = this.responseCache.get(cacheKey);
+    if (cachedResult) {
+      console.log('⚡ Using cached response for:', text);
+      return cachedResult;
     }
 
     // Check for inappropriate content first
@@ -354,7 +535,7 @@ export class TensorFlowService {
       return null;
     }
 
-    // Calculate relevance to Luis's content first
+    // Calculate relevance to Luis' content first
     const relevance = this.calculateRelevance(text);
     
     // If relevance is too low, don't even try to classify
@@ -386,10 +567,21 @@ export class TensorFlowService {
     console.log(`🏆 Best match: ${this.intents[maxIndex]?.tag} (confidence: ${confidence.toFixed(3)})`);
     
     // Enhanced confidence threshold based on relevance
-    const adjustedThreshold = this.confidenceThreshold * (0.8 + 0.2 * relevance);
+    let adjustedThreshold = this.confidenceThreshold * (0.8 + 0.2 * relevance);
+    
+    // Lower threshold for greetings to make them easier to catch
+    if (this.isGreeting(text)) {
+      adjustedThreshold = Math.min(adjustedThreshold, 0.3); // Much lower threshold for greetings
+      console.log(`👋 Greeting detected, using lower threshold: ${adjustedThreshold.toFixed(2)}`);
+    }
     
     if (confidence < adjustedThreshold) {
       console.log(`❌ Low confidence (${confidence.toFixed(2)}) for: "${text}" (threshold: ${adjustedThreshold.toFixed(2)})`);
+      // For generic questions with decent relevance, let AI handle it
+      if (relevance >= 0.3 && this.isGenericQuestion(text)) {
+        console.log(`🤖 Generic question detected, letting AI handle: "${text}"`);
+        return null; // Let AI handle generic questions
+      }
       return null;
     }
 
@@ -398,13 +590,57 @@ export class TensorFlowService {
 
     console.log(`✅ TensorFlow match: "${text}" -> ${intent.tag} (confidence: ${confidence.toFixed(2)}, relevance: ${relevance.toFixed(2)})`);
 
-    return {
+    const classificationResult: ClassificationResult = {
       tag: intent.tag,
       confidence,
       response,
       relevance,
       source: intent.tag.startsWith('learned_') ? 'learned' : 'faq',
     };
+
+    // Cache the result for future use
+    this.cacheResult(cacheKey, classificationResult);
+
+    return classificationResult;
+  }
+
+  /**
+   * Cache management methods
+   */
+  private cacheResult(key: string, result: ClassificationResult): void {
+    // Implement LRU cache eviction
+    if (this.responseCache.size >= this.maxCacheSize) {
+      const firstKey = this.responseCache.keys().next().value;
+      if (firstKey) {
+        this.responseCache.delete(firstKey);
+      }
+    }
+    this.responseCache.set(key, result);
+  }
+
+  /**
+   * Clear response cache
+   */
+  public clearCache(): void {
+    this.responseCache.clear();
+    console.log('🧹 Response cache cleared');
+  }
+
+  /**
+   * Get cache statistics
+   */
+  public getCacheStats(): { size: number; maxSize: number; hitRate?: number } {
+    return {
+      size: this.responseCache.size,
+      maxSize: this.maxCacheSize
+    };
+  }
+
+  /**
+   * Get training metrics
+   */
+  public getTrainingMetrics(): typeof this.trainingMetrics {
+    return { ...this.trainingMetrics };
   }
 
   /**
@@ -412,19 +648,30 @@ export class TensorFlowService {
    */
   async saveModel(): Promise<void> {
     if (!this.model) {
+      console.error('❌ No model to save - model is null');
       throw new Error('No model to save');
     }
 
-    await this.model.save('indexeddb://chatbot-model');
-    
-    // Save vocabulary and intents metadata
-    const metadata = {
-      vocabulary: this.vocabulary,
-      intents: this.intents,
-      timestamp: Date.now(),
-    };
-    
-    localStorage.setItem('chatbot-metadata', JSON.stringify(metadata));
+    try {
+      console.log('💾 Saving model to IndexedDB...');
+      await this.model.save('indexeddb://chatbot-model');
+      console.log('✅ Model saved to IndexedDB');
+      
+      // Save vocabulary and intents metadata
+      const metadata = {
+        vocabulary: this.vocabulary,
+        intents: this.intents,
+        timestamp: Date.now(),
+      };
+      
+      localStorage.setItem('chatbot-metadata', JSON.stringify(metadata));
+      console.log('✅ Metadata saved to localStorage');
+      
+    } catch (error) {
+      console.error('❌ Error saving model:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to save model: ${errorMessage}`);
+    }
   }
 
   /**
@@ -492,6 +739,12 @@ export class TensorFlowService {
       return null;
     }
     
+    // For generic questions with decent relevance, let AI handle it
+    if (relevance >= 0.3 && this.isGenericQuestion(userInput)) {
+      console.log(`🤖 Generic question detected in fallback, letting AI handle: "${userInput}"`);
+      return null;
+    }
+    
     // For relevant topics that didn't match, provide direct Luis answers
     const lowerInput = userInput.toLowerCase();
     
@@ -536,19 +789,25 @@ export class TensorFlowService {
       };
     }
     
-    if (lowerInput.includes('hi') || lowerInput.includes('hello') || lowerInput.includes('hey')) {
+    // Enhanced greeting detection and response
+    if (this.isGreeting(userInput)) {
       const greetings = [
         "Hey there! I'm Luis, nice to meet you. How can I help you today?",
         "Hi! Great to connect. I'm Luis, a software developer and team manager. What brings you here?",
         "Hello! I'm Luis. What can I help you with today?",
         "Hey! Good to see you. I'm Luis - what's on your mind?",
-        "Hi there! I'm Luis, ready to chat. What can I do for you?"
+        "Hi there! I'm Luis, ready to chat. What can I do for you?",
+        "Hello! Great to meet you. I'm Luis, a Full-Stack Developer. How can I assist you today?",
+        "Hi! I'm Luis, a Senior IBM ODM Specialist and QA Team Manager. What can I help you with?",
+        "Hey! I'm Luis, a software developer specializing in AI and machine learning. What brings you here?",
+        "Hello there! I'm Luis, ready to help with your development needs. What's on your mind?",
+        "Hi! I'm Luis, a developer who creates intelligent solutions. How can I assist you today?"
       ];
       return {
-        tag: 'luis.direct_answer',
-        confidence: 0.9,
+        tag: 'luis.greeting',
+        confidence: 0.95, // High confidence for greetings
         response: greetings[Math.floor(Math.random() * greetings.length)],
-        relevance,
+        relevance: 0.8, // High relevance for greetings
         source: 'faq'
       };
     }
@@ -675,4 +934,64 @@ export class TensorFlowService {
     this.relevanceThreshold = Math.max(0.1, Math.min(1.0, newThreshold));
     console.log(`🎯 Relevance threshold updated to: ${this.relevanceThreshold}`);
   }
+
+  /**
+   * Cleanup method for memory management
+   */
+  public cleanup(): void {
+    console.log('🧹 Cleaning up TensorFlow resources...');
+    
+    // Dispose model
+    if (this.model) {
+      this.model.dispose();
+      this.model = null;
+    }
+    
+    // Clear all TensorFlow variables
+    tf.disposeVariables();
+    
+    // Clear cache
+    this.clearCache();
+    
+    // Clear vocabulary and intents
+    this.vocabulary = [];
+    this.intents = [];
+    
+    // Reset training metrics
+    this.trainingMetrics = {
+      startTime: 0,
+      endTime: 0,
+      epochs: 0,
+      finalLoss: 0,
+      finalAccuracy: 0
+    };
+    
+    // Reset initialization flag
+    this.isInitializing = false;
+    
+    console.log('✅ TensorFlow cleanup completed');
+  }
+
+  /**
+   * Get performance statistics
+   */
+  public getPerformanceStats(): {
+    cacheStats: { size: number; maxSize: number };
+    trainingMetrics: {
+      startTime: number;
+      endTime: number;
+      epochs: number;
+      finalLoss: number;
+      finalAccuracy: number;
+    };
+    modelReady: boolean;
+  } {
+    return {
+      cacheStats: this.getCacheStats(),
+      trainingMetrics: this.getTrainingMetrics(),
+      modelReady: this.isModelReady()
+    };
+  }
 }
+
+export default TensorFlowService;

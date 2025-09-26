@@ -1,0 +1,32 @@
+{
+  "name": "Luis AI Chatbot Portfolio",
+  "short_name": "Luis Chatbot",
+  "description": "Interactive AI chatbot showcasing Luis' technical expertise with TensorFlow.js, OpenAI integration, and modern web development skills.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/LuisBot.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/LuisBot.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/LuisBot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business", "developer"],
+  "lang": "en",
+  "dir": "ltr"
+}

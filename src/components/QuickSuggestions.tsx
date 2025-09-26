@@ -88,11 +88,11 @@ export const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({
       transition={{ duration: 0.3 }}
       className={`quick-suggestions ${className}`}
     >
-      <div className="mb-3">
-        <p className="text-sm text-gray-500 font-medium">Quick questions:</p>
+      <div className="mb-2 md:mb-3">
+        <p className="text-xs md:text-sm text-gray-500 font-medium">Quick questions:</p>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         {suggestions.map((suggestion) => (
           <motion.button
             key={suggestion.id}
@@ -100,12 +100,12 @@ export const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={() => onSuggestionClick(suggestion.text, suggestion.triggerLead)}
             className={`
-              flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-all duration-200
+              flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-3 rounded-lg border text-left transition-all duration-200
               ${suggestion.triggerLead 
                 ? 'border-blue-200 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 text-blue-800' 
                 : 'border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 text-gray-700'
               }
-              shadow-sm hover:shadow-md
+              shadow-sm hover:shadow-md min-h-[44px]
             `}
           >
             <div className={`
@@ -115,7 +115,7 @@ export const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({
               {suggestion.icon}
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-medium leading-tight">
+              <span className="text-xs md:text-sm font-medium leading-tight">
                 {suggestion.text}
               </span>
               {suggestion.triggerLead && (
@@ -129,7 +129,7 @@ export const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({
         ))}
       </div>
       
-      <div className="mt-3 text-xs text-gray-400 text-center">
+      <div className="mt-2 md:mt-3 text-xs text-gray-400 text-center">
         Click any suggestion to start the conversation
       </div>
     </motion.div>

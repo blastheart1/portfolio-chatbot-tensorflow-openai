@@ -1,6 +1,62 @@
 {
   "intents": [
     {
+      "tag": "general.what_do_you_do",
+      "patterns": [
+        "What do you do?",
+        "What do you work on?",
+        "What's your job?",
+        "What's your role?",
+        "What kind of work do you do?",
+        "What are your responsibilities?",
+        "What do you specialize in?",
+        "What's your profession?",
+        "What's your career?",
+        "What do you do for work?",
+        "What's your occupation?",
+        "What kind of developer are you?",
+        "What type of work do you do?",
+        "What are you good at?",
+        "What do you excel in?",
+        "What's your expertise?",
+        "What do you focus on?",
+        "What's your main work?",
+        "What do you handle?",
+        "What are you responsible for?"
+      ],
+      "responses": [
+        "I'm a Full-Stack Developer who leverages AI, machine learning, and generative technologies to elevate business processes, automate complex workflows, and create intelligent solutions that drive measurable results and competitive advantage."
+      ]
+    },
+    {
+      "tag": "general.what_kind_of_websites",
+      "patterns": [
+        "What kind of webpages do you do?",
+        "What types of websites do you build?",
+        "What kind of sites do you create?",
+        "What websites do you make?",
+        "What kind of web development do you do?",
+        "What types of projects do you work on?",
+        "What kind of applications do you build?",
+        "What sort of websites do you develop?",
+        "What kind of web projects do you handle?",
+        "What types of sites do you specialize in?",
+        "What kind of web solutions do you provide?",
+        "What sort of development do you do?",
+        "What kind of software do you build?",
+        "What types of apps do you create?",
+        "What kind of platforms do you develop?",
+        "What sort of systems do you build?",
+        "What kind of solutions do you provide?",
+        "What types of products do you create?",
+        "What kind of services do you offer?",
+        "What sort of work do you specialize in?"
+      ],
+      "responses": [
+        "I build comprehensive web solutions including: E-commerce websites with payment integration, AI-powered chatbots, Full-stack applications with React/Next.js, Mobile-responsive websites, Progressive Web Apps (PWA), Custom web applications, Portfolio websites, and Enterprise solutions. I specialize in modern tech stacks using TypeScript, Node.js, PostgreSQL, and AI integration."
+      ]
+    },
+    {
       "tag": "about.who_are_you",
       "patterns": [
         "Who are you?",
@@ -16,11 +72,11 @@
         "Who is Antonio Luis Santos?",
         "What does Luis do for a living?",
         "Can you introduce Luis?",
-        "What's Luis's profession?",
+        "What's Luis' profession?",
         "Tell me about the developer behind this chatbot"
       ],
       "responses": [
-        "My name is Luis (Antonio Luis Santos). I am a software developer and team manager with strong expertise in building modern web applications, AI-powered solutions, and business rule management systems."
+        "My name is Luis (Antonio Luis Santos). I am a software developer with strong expertise in building modern web applications and AI-powered solutions."
       ]
     },
     {
@@ -34,7 +90,7 @@
         "What roles have you had?"
       ],
       "responses": [
-        "I started with Java, C++, and quality assurance, but I have since upskilled to full-stack development with TypeScript, ReactJS, and TailwindCSS. My career also includes experience as a BRMS developer and QA team manager."
+        "I started with Java, C++, and quality assurance, but I have since upskilled to full-stack development with TypeScript, ReactJS, and TailwindCSS."
       ]
     },
     {
@@ -104,7 +160,7 @@
         "What makes this chatbot special?",
         "Can you explain how you work?",
         "What's the technology behind this?",
-        "How does Luis's chatbot work?",
+        "How does Luis' chatbot work?",
         "What's special about this AI?",
         "How did Luis create you?",
         "What makes this chatbot different?",
@@ -113,7 +169,35 @@
         "What's your AI technology stack?"
       ],
       "responses": [
-        "I'm built using TensorFlow.js for local intent classification and machine learning, combined with OpenAI for complex queries. I learn from conversations to improve my responses about Luis's work and expertise. My architecture includes relevance scoring to stay focused on Luis's professional content."
+        "I'm built using TensorFlow.js for local intent classification and machine learning, combined with OpenAI for complex queries. I learn from conversations to improve my responses about Luis' work and expertise. My architecture includes relevance scoring to stay focused on Luis' professional content."
+      ]
+    },
+    {
+      "tag": "services.ecommerce",
+      "patterns": [
+        "Do you do ecommerce sites?",
+        "Can you build ecommerce websites?",
+        "Do you create online stores?",
+        "Can you make an e-commerce site?",
+        "Do you build shopping websites?",
+        "Can you develop online shops?",
+        "Do you work on ecommerce projects?",
+        "Can you create an online store?",
+        "Do you build e-commerce platforms?",
+        "Can you make shopping sites?",
+        "Do you develop online retail sites?",
+        "Can you create ecommerce solutions?",
+        "Do you work with online stores?",
+        "Can you build digital stores?",
+        "Do you create web stores?",
+        "Can you develop ecommerce applications?",
+        "Do you build online marketplaces?",
+        "Can you create retail websites?",
+        "Do you work on shopping platforms?",
+        "Can you build ecommerce systems?"
+      ],
+      "responses": [
+        "Yes! I specialize in building comprehensive e-commerce websites and online stores. I create full-featured e-commerce solutions with payment integration (Stripe, PayPal), inventory management, user authentication, shopping cart functionality, order processing, and AI chatbot support. I use modern tech stacks like React, Next.js, Node.js, and PostgreSQL to build scalable online stores that can handle high traffic and complex business requirements."
       ]
     },
     {
@@ -125,7 +209,86 @@
         "Do you do freelance work?"
       ],
       "responses": [
-        "Yes. I am open to freelance opportunities in full-stack development, AI chatbot design, business rule management systems, and QA process optimization."
+        "Yes. I am open to freelance opportunities in full-stack development, AI chatbot design, and QA process optimization."
+      ]
+    },
+    {
+      "tag": "services.ecommerce.features",
+      "patterns": [
+        "What ecommerce features do you include?",
+        "What's included in ecommerce websites?",
+        "Do you add payment processing?",
+        "Can you integrate payment systems?",
+        "Do you include shopping cart functionality?",
+        "Can you add inventory management?",
+        "Do you include user accounts?",
+        "Can you add order tracking?",
+        "Do you include product catalogs?",
+        "Can you add search functionality?",
+        "Do you include customer reviews?",
+        "Can you add wishlist features?",
+        "Do you include admin panels?",
+        "Can you add analytics tracking?",
+        "Do you include mobile optimization?",
+        "Can you add SEO features?",
+        "Do you include security features?",
+        "Can you add multi-language support?",
+        "Do you include shipping calculators?",
+        "Can you add discount systems?"
+      ],
+      "responses": [
+        "I include comprehensive e-commerce features: payment processing (Stripe, PayPal, Square), shopping cart with persistent storage, user authentication and accounts, inventory management with stock tracking, order processing and tracking, product catalogs with search and filtering, customer reviews and ratings, wishlist functionality, admin dashboard for management, analytics integration (Google Analytics, Facebook Pixel), mobile-responsive design, SEO optimization, security features (SSL, data encryption), multi-language support, shipping calculators, discount and coupon systems, and AI chatbot integration for customer support."
+      ]
+    },
+    {
+      "tag": "services.ecommerce.tech",
+      "patterns": [
+        "What technology do you use for ecommerce?",
+        "What tech stack for online stores?",
+        "Do you use React for ecommerce?",
+        "Can you build with Next.js?",
+        "Do you use Node.js for backend?",
+        "What database for ecommerce?",
+        "Do you use PostgreSQL?",
+        "Can you integrate with APIs?",
+        "Do you use TypeScript?",
+        "What payment APIs do you use?",
+        "Do you use Stripe integration?",
+        "Can you add PayPal?",
+        "Do you use Tailwind CSS?",
+        "What hosting do you recommend?",
+        "Do you use Vercel?",
+        "Can you deploy to AWS?",
+        "Do you use Docker?",
+        "What about security?",
+        "Do you use HTTPS?",
+        "Can you add SSL certificates?"
+      ],
+      "responses": [
+        "I use a modern, scalable tech stack for e-commerce: Frontend with React/Next.js and TypeScript for type safety, Tailwind CSS for responsive design, Node.js/Express for backend APIs, PostgreSQL for robust data management, Stripe/PayPal for secure payments, Redis for caching, AWS/Vercel for hosting, Docker for containerization, and comprehensive security with HTTPS, SSL certificates, data encryption, and secure authentication. I also integrate with third-party APIs for shipping, analytics, and marketing tools."
+      ]
+    },
+    {
+      "tag": "services.ecommerce.pricing",
+      "patterns": [
+        "How much for ecommerce websites?",
+        "What's the cost of online stores?",
+        "How much for ecommerce development?",
+        "What's the price for online shops?",
+        "How much for shopping websites?",
+        "What's the cost of ecommerce sites?",
+        "How much for digital stores?",
+        "What's the price for web stores?",
+        "How much for online marketplaces?",
+        "What's the cost of retail websites?",
+        "How much for ecommerce platforms?",
+        "What's the price for shopping platforms?",
+        "How much for ecommerce systems?",
+        "What's the cost of online retail?",
+        "How much for digital commerce?"
+      ],
+      "responses": [
+        "E-commerce website pricing depends on complexity and features. Basic online stores start at ₱45,000 ($1,199 overseas), mid-level e-commerce sites with advanced features are ₱80,000 ($2,199 overseas), and enterprise e-commerce platforms with custom functionality start at ₱150,000 ($3,999 overseas). All include payment integration, inventory management, user accounts, mobile optimization, and AI chatbot support. Pricing varies based on product catalog size, payment methods, custom features, and integration requirements."
       ]
     },
     {
@@ -175,18 +338,6 @@
       ],
       "responses": [
         "Yes. I have strong expertise in QA practices including test planning, functional testing, and building efficient QA workflows, often while managing teams."
-      ]
-    },
-    {
-      "tag": "skills.brms",
-      "patterns": [
-        "What is your experience with BRMS?",
-        "Do you know IBM ODM?",
-        "Have you worked with business rules?",
-        "What do you know about business rule systems?"
-      ],
-      "responses": [
-        "I have professional experience with IBM Operational Decision Manager, where I design, test, and deploy business rules to align software logic with enterprise needs."
       ]
     },
     {
@@ -294,7 +445,7 @@
         "What consulting do you offer?"
       ],
       "responses": [
-        "Yes. I provide consulting in AI chatbot development, front-end architecture with React and Tailwind, QA team management, and BRMS development."
+        "Yes. I provide consulting in AI chatbot development, front-end architecture with React and Tailwind, and QA team management."
       ]
     },
     {

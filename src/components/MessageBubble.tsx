@@ -29,13 +29,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
     >
       <div
-        className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+        className={`max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-3 md:px-4 py-2 md:py-3 rounded-2xl ${
           isUser
             ? 'bg-chat-bubble-user text-white rounded-br-md'
             : 'bg-chat-bubble-bot text-gray-800 border border-chat-border rounded-bl-md'
         }`}
       >
-        <div className="text-sm leading-relaxed">
+        <div className="text-xs sm:text-sm leading-relaxed">
           {!isUser ? (
             <MarkdownText content={message.content} />
           ) : (
@@ -45,7 +45,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         
         {/* Source indicator for bot messages */}
         {!isUser && source && (
-          <div className="mt-2 text-xs opacity-70">
+          <div className="mt-1 md:mt-2 text-xs opacity-70">
             {source === 'faq' ? (
               <span className="inline-flex items-center">
                 📚 TensorFlow

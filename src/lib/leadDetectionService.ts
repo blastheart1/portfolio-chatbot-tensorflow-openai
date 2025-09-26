@@ -20,7 +20,12 @@ export class LeadDetectionService {
       'ecommerce', 'e-commerce', 'online store', 'web development', 'full stack',
       'frontend', 'backend', 'react', 'node', 'javascript', 'typescript',
       'brms', 'business rules', 'qa', 'quality assurance', 'team management',
-      'ibm odm', 'odm specialist', 'automation', 'workflow', 'integration'
+      'ibm odm', 'odm specialist', 'automation', 'workflow', 'integration',
+      // E-commerce specific
+      'shopify', 'shop', 'store', 'coffee shop', 'restaurant', 'business',
+      'retail', 'selling', 'products', 'inventory', 'payment', 'checkout',
+      'shopping cart', 'customer', 'orders', 'sales', 'revenue', 'profit',
+      'business website', 'company website', 'corporate website'
     ],
     availability: [
       'available', 'busy', 'schedule', 'timeline', 'when can', 'how long',
@@ -42,7 +47,16 @@ export class LeadDetectionService {
     'i need a website', 'i need an app', 'i need a chatbot',
     'build me a', 'create a', 'develop a', 'make a',
     'looking to hire', 'looking to work with', 'want to hire',
-    'need help with', 'need assistance with', 'need support with'
+    'need help with', 'need assistance with', 'need support with',
+    // E-commerce specific buying intent
+    'i want a website for', 'i need a website for', 'build a website for',
+    'create a website for', 'develop a website for', 'make a website for',
+    'i want a website for my', 'i need a website for my', 'build a website for my',
+    'create a website for my', 'develop a website for my', 'make a website for my',
+    'do you also use', 'do you work with', 'can you help with',
+    'can you build', 'can you create', 'can you develop',
+    'shopify', 'ecommerce', 'e-commerce', 'online store', 'coffee shop',
+    'restaurant', 'business', 'retail', 'shop', 'store'
   ];
 
   // Negative indicators (don't show form)
@@ -51,6 +65,73 @@ export class LeadDetectionService {
     'don\'t need', 'not looking for', 'just browsing', 'just wondering',
     'no thanks', 'not now', 'maybe someday'
   ];
+
+  /**
+   * Detect e-commerce and business website specific leads
+   */
+  private detectEcommerceLead(userInput: string): LeadTrigger {
+    const lowerInput = userInput.toLowerCase().trim();
+    
+    // High-confidence e-commerce indicators
+    const ecommerceIndicators = [
+      'coffee shop', 'restaurant', 'retail', 'business', 'company',
+      'shopify', 'ecommerce', 'e-commerce', 'online store', 'shop',
+      'store', 'selling', 'products', 'inventory', 'payment',
+      'checkout', 'shopping cart', 'customer', 'orders', 'sales'
+    ];
+    
+    // Business website indicators
+    const businessWebsiteIndicators = [
+      'website for my', 'website for a', 'business website',
+      'company website', 'corporate website', 'professional website'
+    ];
+    
+    // Check for e-commerce indicators
+    const hasEcommerceIndicator = ecommerceIndicators.some(indicator => 
+      lowerInput.includes(indicator)
+    );
+    
+    // Check for business website indicators
+    const hasBusinessWebsiteIndicator = businessWebsiteIndicators.some(indicator => 
+      lowerInput.includes(indicator)
+    );
+    
+    if (hasEcommerceIndicator || hasBusinessWebsiteIndicator) {
+      return {
+        shouldShowForm: true,
+        triggerContext: this.generateEcommerceTriggerContext(lowerInput),
+        confidence: 0.9, // High confidence for e-commerce leads
+        category: 'services'
+      };
+    }
+    
+    return {
+      shouldShowForm: false,
+      triggerContext: '',
+      confidence: 0,
+      category: 'none'
+    };
+  }
+
+  /**
+   * Generate e-commerce specific trigger context
+   */
+  private generateEcommerceTriggerContext(input: string): string {
+    const contexts = [
+      "Perfect! I specialize in building e-commerce websites and online stores!",
+      "Excellent! I can help you create a professional website for your business!",
+      "Great! I have extensive experience with Shopify and e-commerce platforms!",
+      "I'd love to help you build your online presence!",
+      "That's exactly what I do! I can create a beautiful website for your business!",
+      "Perfect! I can help you set up your online store with payment integration!",
+      "I'm excited to help you with your business website project!",
+      "I can definitely help you create a professional website for your coffee shop!",
+      "I'd be happy to discuss your e-commerce project needs!",
+      "Let me help you build your online business!"
+    ];
+    
+    return contexts[Math.floor(Math.random() * contexts.length)];
+  }
 
   /**
    * Analyze user input to determine if lead form should be shown
@@ -70,6 +151,12 @@ export class LeadDetectionService {
         confidence: 0,
         category: 'none'
       };
+    }
+
+    // Check for e-commerce leads first (high priority)
+    const ecommerceLead = this.detectEcommerceLead(userInput);
+    if (ecommerceLead.shouldShowForm) {
+      return ecommerceLead;
     }
 
     let maxConfidence = 0;
@@ -172,7 +259,16 @@ export class LeadDetectionService {
         "Great! I offer a range of services that could help you!",
         "I'd be happy to discuss my services with you!",
         "That's exactly the kind of project I specialize in!",
-        "I can definitely help you with that type of work!"
+        "I can definitely help you with that type of work!",
+        // E-commerce specific
+        "Perfect! I specialize in building e-commerce websites and online stores!",
+        "Excellent! I can help you create a professional website for your business!",
+        "Great! I have extensive experience with Shopify and e-commerce platforms!",
+        "I'd love to help you build your online presence!",
+        "That's exactly what I do! I can create a beautiful website for your business!",
+        "Perfect! I can help you set up your online store with payment integration!",
+        "I'm excited to help you with your business website project!",
+        "I can definitely help you create a professional website for your coffee shop!"
       ],
       availability: [
         "I'd love to discuss your timeline!",
@@ -255,7 +351,16 @@ export class LeadDetectionService {
       services: [
         "What specific features do you need?",
         "Do you have a timeline in mind?",
-        "What's your budget for this project?"
+        "What's your budget for this project?",
+        // E-commerce specific
+        "What type of business are you running?",
+        "Do you need payment integration?",
+        "What products will you be selling?",
+        "Do you need inventory management?",
+        "Are you looking for a Shopify store or custom e-commerce?",
+        "What's your target audience?",
+        "Do you need a mobile-responsive design?",
+        "What's your current online presence like?"
       ],
       availability: [
         "What type of project are you working on?",

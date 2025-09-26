@@ -60,3 +60,109 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Prevent zoom on input focus for iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Improve touch targets */
+  button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Optimize text sizing */
+  h1 {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  /* Improve grid layouts for mobile */
+  .grid {
+    gap: 1rem;
+  }
+  
+  /* Better scrollbar for mobile */
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch targets */
+  button, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .hover\:bg-blue-600:hover {
+    background-color: inherit;
+  }
+  
+  .hover\:bg-gray-50:hover {
+    background-color: inherit;
+  }
+  
+  .hover\:bg-gray-100:hover {
+    background-color: inherit;
+  }
+  
+  .hover\:shadow-md:hover {
+    box-shadow: inherit;
+  }
+  
+  .hover\:border-blue-300:hover {
+    border-color: inherit;
+  }
+  
+  .hover\:border-gray-300:hover {
+    border-color: inherit;
+  }
+}
+
+/* iOS-specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  /* Fix iOS viewport issues */
+  .fixed {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  
+  /* Prevent iOS bounce scrolling in chat */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Fix iOS input zoom */
+  input[type="text"], input[type="email"], input[type="tel"], textarea, select {
+    font-size: 16px;
+    -webkit-appearance: none;
+    border-radius: 8px;
+  }
+}
+
+/* Android-specific optimizations */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  /* Fix Android rendering issues */
+  .fixed {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+}
