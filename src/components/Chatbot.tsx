@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { } from 'lucide-react';
 import { ChatWindow } from './ChatWindow';
 import { PerformanceMonitor } from './PerformanceMonitor';
 import { PerformanceToggle } from './PerformanceToggle';
