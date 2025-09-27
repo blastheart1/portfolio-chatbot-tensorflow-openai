@@ -1,5 +1,5 @@
 {
-  "name": "luis-ai-chatbot",
+  "name": "@blastheart1/luis-ai-chatbot",
   "version": "1.0.0",
   "description": "AI-powered chatbot component with TensorFlow.js and OpenAI integration",
   "main": "dist/index.js",
@@ -28,12 +28,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/luis-ai-chatbot.git"
+    "url": "git+https://github.com/blastheart1/portfolio-chatbot-tensorflow-openai.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/luis-ai-chatbot/issues"
+    "url": "https://github.com/blastheart1/portfolio-chatbot-tensorflow-openai/issues"
   },
-  "homepage": "https://github.com/your-username/luis-ai-chatbot#readme",
+  "homepage": "https://github.com/blastheart1/portfolio-chatbot-tensorflow-openai#readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
