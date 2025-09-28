@@ -16,12 +16,14 @@ interface ChatbotProps {
     learningCount: number;
     isConfigured: boolean;
   }) => void;
+  onChatToggle?: (isOpen: boolean) => void;
 }
 
 export const Chatbot: React.FC<ChatbotProps> = ({ 
   openaiApiKey = '', 
   confidenceThreshold = 0.75,
-  onStatusChange
+  onStatusChange,
+  onChatToggle
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isModelReady, setIsModelReady] = useState(false);
@@ -110,6 +112,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
         // Performance monitor is hidden by default, can be toggled
         setShowPerformanceMonitor(false);
 
+
       } catch (err) {
         console.error('❌ Error initializing model:', err);
         // Set model as ready even if training failed, so we can use simple matching
@@ -122,6 +125,33 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     initializeModel();
   }, [tensorflowService, openaiService]);
 
+  // Update performance stats periodically
+  useEffect(() => {
+    if (!tensorflowService || !openaiService) return;
+
+    const updatePerformanceStats = () => {
+      const tensorflowStats = tensorflowService.getPerformanceStats();
+      const openaiStats = openaiService.getPerformanceStats();
+      const combinedStats = {
+        tensorflow: tensorflowStats,
+        openai: openaiStats
+      };
+      setPerformanceStats(combinedStats);
+      console.log('📊 Updated Performance Stats:', {
+        tensorflow: tensorflowStats,
+        openai: openaiStats
+      });
+    };
+
+    // Update immediately
+    updatePerformanceStats();
+
+    // Update every 3 seconds
+    const statsInterval = setInterval(updatePerformanceStats, 3000);
+    
+    return () => clearInterval(statsInterval);
+  }, [tensorflowService, openaiService]);
+
   // Cleanup on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
@@ -132,7 +162,12 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   }, [tensorflowService, openaiService]);
 
   const toggleChat = () => {
-    setIsOpen(!isOpen);
+    const newIsOpen = !isOpen;
+    setIsOpen(newIsOpen);
+    // Notify parent component about chat state change
+    if (onChatToggle) {
+      onChatToggle(newIsOpen);
+    }
   };
 
   const togglePerformanceMonitor = () => {
@@ -222,7 +257,13 @@ export const Chatbot: React.FC<ChatbotProps> = ({
       {/* Chat Window */}
       <ChatWindow
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+          // Notify parent component about chat state change
+          if (onChatToggle) {
+            onChatToggle(false);
+          }
+        }}
         tensorflowService={tensorflowService}
         openaiService={openaiService}
         onLearningExample={handleLearningExample}

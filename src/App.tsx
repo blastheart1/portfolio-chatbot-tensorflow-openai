@@ -28,6 +28,57 @@ function App() {
     learningCount: 0,
     isConfigured: false
   });
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Handle scroll wheel blocking when chat is open (but allow chat window scrolling)
+  React.useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (isChatOpen) {
+        // Check if the event target is within the chat window or its children
+        const target = e.target as Element;
+        const chatWindow = document.getElementById('chat-window-container');
+        
+        if (chatWindow && (chatWindow.contains(target) || chatWindow === target)) {
+          // Check if this is a scroll on the suggestions section (entire section, not just badges)
+          const suggestionsSection = chatWindow.querySelector('[data-suggestions-section]');
+          if (suggestionsSection && (suggestionsSection.contains(target) || suggestionsSection === target)) {
+            // Find the scrollable container within the suggestions section
+            const suggestionContainer = suggestionsSection.querySelector('.scrollbar-hide');
+            if (suggestionContainer) {
+            // Convert vertical scroll to horizontal for suggestion badges (more sensitive)
+            e.preventDefault();
+            e.stopPropagation();
+            suggestionContainer.scrollLeft += e.deltaY * 3.0; // Much more sensitive (1.5 scrolls to fully scroll)
+            console.log('✅ Horizontal scroll on suggestions section');
+              return;
+            }
+          }
+          
+          // Allow normal scrolling within the chat window
+          console.log('✅ Allowing scroll within chat window');
+          return;
+        }
+        
+        // Block scrolling on the main page
+        console.log('🚫 Blocking scroll on main page');
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+
+    if (isChatOpen) {
+      // Block wheel events on document level
+      document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+      // Also block on window level as backup
+      window.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    }
+
+    return () => {
+      document.removeEventListener('wheel', handleWheel, { capture: true });
+      window.removeEventListener('wheel', handleWheel, { capture: true });
+    };
+  }, [isChatOpen]);
 
   // Check if this is the embed route
   if (window.location.pathname === '/embed') {
@@ -284,6 +335,7 @@ function App() {
         openaiApiKey={process.env.REACT_APP_OPENAI_API_KEY}
         confidenceThreshold={0.6}
         onStatusChange={setChatbotStatus}
+        onChatToggle={setIsChatOpen}
       />
       
       {/* Footer */}

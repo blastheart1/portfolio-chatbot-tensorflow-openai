@@ -47,6 +47,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [leadTriggerContext, setLeadTriggerContext] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [directFormTriggered, setDirectFormTriggered] = useState(false);
+  const directFormTriggeredRef = useRef(false);
+  const [badgeOrder, setBadgeOrder] = useState([
+    'Get Quote',
+    'Contact Me',
+    'Hire Me',
+    'Services',
+    'Build me a Website',
+    'Pricing',
+    'AI Chatbot',
+    'E-commerce Store',
+    'Consulting',
+    'Portfolio'
+  ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -180,7 +197,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   // Simple keyword-based FAQ matching as fallback
-  const findSimpleFAQMatch = (userMessage: string): { response: string } | null => {
+  const findSimpleFAQMatch = (userMessage: string): { response: string; directLeadForm?: boolean } | null => {
     const message = userMessage.toLowerCase();
     
     // Check for inappropriate content first
@@ -219,8 +236,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         response: "I love Formula 1, cycling (both road and gravel), RC car builds with Tamiya kits, coffee brewing, and sim racing. I share these hobbies on my YouTube channel 'Sunraku-san TV'."
       },
       {
-        keywords: ['contact', 'email', 'linkedin', 'reach you', 'hire', 'freelance'],
-        response: "You can reach me at antonioluis.santos1@gmail.com or through LinkedIn. I'm based in Manila, Philippines, and I'm open to freelance opportunities in full-stack development, AI chatbot design, and QA process optimization."
+        keywords: ['contact me', 'contact', 'email', 'linkedin', 'reach you', 'hire', 'freelance', 'get in touch', 'reach out', 'connect', 'call me', 'phone', 'work together', 'collaborate', 'partner', 'hiring'],
+        response: "I'd be happy to discuss your project needs! Let me collect some information so I can provide you with the best possible solution.",
+        directLeadForm: true
       },
       {
         keywords: ['background', 'experience', 'career', 'work'],
@@ -228,7 +246,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       },
       {
         keywords: ['pricing', 'cost', 'price', 'rate', 'how much'],
-        response: "I offer three website packages: Starter at ₱22,000 ($599 overseas), Professional at ₱45,000 ($1,199 overseas), and Enterprise at ₱100,000 ($2,999 overseas). All include responsive design, SEO, hosting, and AI chatbot integration."
+        response: "I offer three website packages: Starter at ₱22,000 ($599 overseas), Professional at ₱45,000 ($1,199 overseas), and Enterprise at ₱100,000 ($2,999 overseas). All include responsive design, SEO, hosting, and AI chatbot integration. Would you like me to reach out to discuss your project needs in more detail?"
       },
       {
         keywords: ['ecommerce', 'e-commerce', 'online store', 'shop', 'website'],
@@ -237,32 +255,28 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       {
         keywords: ['services', 'what services', 'what can you help', 'what do you do for clients', 'solutions'],
         response: "Hello! I offer a range of services tailored to meet your needs:\n\n**1. Website Development**\n• **Starter** (₱22,000/$599 overseas) - Perfect for small businesses\n• **Professional** (₱45,000/$1,199 overseas) - Ideal for growing businesses\n• **Enterprise** (₱100,000/$2,999 overseas) - For large organizations\n\n**2. AI Chatbot Integration**\n• Smart Support Chatbot (+₱7,000)\n• 24/7 E-commerce Chatbot (+₱15,000)\n• Advanced AI Chatbot (included in Enterprise)\n\n**3. Full-stack Development**\nFrom frontend to backend, I specialize in building future-ready applications using React, Next.js, TypeScript, Node.js, Express, and PostgreSQL.\n\n**4. BRMS Solutions**\nAs a Senior IBM ODM Specialist, I provide Business Rule Management Systems for enterprise solutions.\n\n**5. QA & Team Management**\nI lead QA teams and optimize processes for accuracy, reliability, and seamless delivery.\n\nFeel free to reach out to discuss your specific needs!"
+      },
+      {
+        keywords: ['get quote', 'quote', 'estimate', 'proposal', 'hire me', 'work with me', 'project quote', 'cost estimate', 'budget', 'pricing details'],
+        response: "I'd be happy to provide you with a detailed quote for your project! Let me collect some information about your requirements so I can give you the most accurate pricing.",
+        directLeadForm: true
       }
     ];
 
     for (const match of faqMatches) {
       if (match.keywords.some(keyword => message.includes(keyword))) {
-        return { response: match.response };
+        return { 
+          response: match.response,
+          directLeadForm: (match as any).directLeadForm || false
+        };
       }
     }
     
     return null;
   };
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage: Message = {
-      id: generateUniqueId(),
-      content: inputValue.trim(),
-      isUser: true,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsTyping(true);
-
+  // Process message logic (extracted for reuse)
+  const processMessage = async (userMessage: Message) => {
     try {
       // Check for lead generation response FIRST (before regular processing)
       const isPositiveResponse = checkFollowUpInterest(userMessage.content);
@@ -300,6 +314,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         return; // Exit early - don't process as regular message
       }
 
+      // Check for direct contact requests first (before any processing)
+      const userInput = userMessage.content.toLowerCase();
+      const directContactKeywords = ['contact me', 'contact', 'get quote', 'quote', 'estimate', 'hire me', 'work with me'];
+      const isDirectContact = directContactKeywords.some(keyword => userInput.includes(keyword));
+      
+      if (isDirectContact) {
+        console.log('🎯 Direct contact detected early:', userInput, 'matched keyword:', directContactKeywords.find(k => userInput.includes(k)));
+        setDirectFormTriggered(true);
+        directFormTriggeredRef.current = true;
+      }
+
       let response: Message;
       let usedOpenAI = false;
       let openAiResponse = '';
@@ -320,6 +345,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             confidence: prediction.confidence,
             relevance: prediction.relevance,
           };
+          
+          // Show lead form if this was a direct contact request
+          if (isDirectContact) {
+            setTimeout(() => {
+              setShowLeadForm(true);
+            }, 1500);
+          }
         } else {
           // TensorFlow didn't find a good match, try Luis-focused fallback
           console.log('📚 TensorFlow no match, trying Luis direct answers...');
@@ -336,10 +368,37 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               confidence: fallbackPrediction.confidence,
               relevance: fallbackPrediction.relevance,
             };
+            
+            // Show lead form if this was a direct contact request
+            if (isDirectContact) {
+              setTimeout(() => {
+                setShowLeadForm(true);
+              }, 1500);
+            }
           } else {
+            // No TensorFlow match, try simple keyword matching first
+            const simpleMatch = findSimpleFAQMatch(userMessage.content);
+            if (simpleMatch) {
+              response = {
+                id: generateUniqueId(),
+                content: simpleMatch.response,
+                isUser: false,
+                timestamp: new Date(),
+                source: 'faq',
+              };
+              
+              // Check if this should trigger direct lead form
+              if (simpleMatch.directLeadForm) {
+                // Mark that we've triggered direct form to prevent follow-up message
+                setDirectFormTriggered(true);
+                // Show lead form immediately after response
+                setTimeout(() => {
+                  setShowLeadForm(true);
+                }, 1500);
+              }
+            } else if (openaiService.isConfigured()) {
             // No direct answer available, use OpenAI with Luis context
             console.log('🤖 Using OpenAI with Luis context for complex/generic questions...');
-            if (openaiService.isConfigured()) {
               try {
                 const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content, messages);
                 openAiResponse = aiResponse.content;
@@ -385,6 +444,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             timestamp: new Date(),
             source: 'faq',
           };
+          
+          // Check if this should trigger direct lead form
+          if (simpleMatch.directLeadForm) {
+            // Mark that we've triggered direct form to prevent follow-up message
+            setDirectFormTriggered(true);
+            // Show lead form immediately after response
+            setTimeout(() => {
+              setShowLeadForm(true);
+            }, 1500);
+          }
         } else if (openaiService.isConfigured()) {
           try {
             const aiResponse = await openaiService.generatePortfolioResponse(userMessage.content, messages);
@@ -430,28 +499,38 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           }
         }, 100);
 
-        // Check for lead generation opportunity
-        const conversationHistory = [...messages, userMessage].map(m => m.content);
-        const leadTrigger = leadDetectionService.current.detectLeadOpportunity(userMessage.content, conversationHistory);
-        
-        if (leadTrigger.shouldShowForm) {
-          console.log('🎯 Lead opportunity detected:', leadTrigger);
-          // Instead of showing form immediately, ask if they want to discuss further
-          setTimeout(() => {
-            const followUpMessage: Message = {
-              id: generateUniqueId(),
-              content: `${leadTrigger.triggerContext} Would you like me to reach out to discuss your project needs in more detail?`,
-              isUser: false,
-              timestamp: new Date(),
-              source: 'faq',
-              confidence: 0.9,
-              relevance: 0.8,
-            };
-            setMessages(prev => [...prev, followUpMessage]);
-            setLeadTriggerContext(leadTrigger.triggerContext);
-            // Don't show form yet - wait for user response
-          }, 1500);
+        // Check for lead generation opportunity (only if we haven't already triggered direct form)
+        if (!directFormTriggered && !directFormTriggeredRef.current) {
+          const conversationHistory = [...messages, userMessage].map(m => m.content);
+          const leadTrigger = leadDetectionService.current.detectLeadOpportunity(userMessage.content, conversationHistory);
+          
+          if (leadTrigger.shouldShowForm) {
+            console.log('🎯 Lead opportunity detected:', leadTrigger);
+            // Instead of showing form immediately, ask if they want to discuss further
+            setTimeout(() => {
+              const followUpMessage: Message = {
+                id: generateUniqueId(),
+                content: `${leadTrigger.triggerContext} Would you like me to reach out to discuss your project needs in more detail?`,
+                isUser: false,
+                timestamp: new Date(),
+                source: 'faq',
+                confidence: 0.9,
+                relevance: 0.8,
+              };
+              setMessages(prev => [...prev, followUpMessage]);
+              setLeadTriggerContext(leadTrigger.triggerContext);
+              // Don't show form yet - wait for user response
+            }, 1500);
+          }
+        } else {
+          console.log('🚫 Skipping lead detection - direct form already triggered for:', userMessage.content);
         }
+        
+        // Reset the direct form triggered flag for next message (after lead detection timeout)
+        setTimeout(() => {
+          setDirectFormTriggered(false);
+          directFormTriggeredRef.current = false;
+        }, 2000);
 
         // Show learning prompt if OpenAI was used
         if (usedOpenAI && openAiResponse) {
@@ -477,6 +556,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!inputValue.trim()) return;
+
+    const userMessage: Message = {
+      id: generateUniqueId(),
+      content: inputValue.trim(),
+      isUser: true,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
+
+    // Use the extracted processMessage function
+    processMessage(userMessage);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -494,6 +591,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       await resendService.current.sendWelcomeEmail(leadData);
       
       console.log('✅ Lead submitted successfully:', leadData);
+      
+      // Mark form as successfully submitted
+      setFormSubmitted(true);
       
       // Add thank you message after successful submission
       setTimeout(() => {
@@ -524,6 +624,35 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     if (triggerLead) {
       setLeadTriggerContext(`You asked about: "${suggestion}"`);
     }
+  };
+
+  // Handle suggestion badge clicks
+  const handleSuggestionBadgeClick = (suggestion: string) => {
+    // Move clicked badge to the bottom of the list
+    setBadgeOrder(prevOrder => {
+      const newOrder = [...prevOrder];
+      const clickedIndex = newOrder.indexOf(suggestion);
+      if (clickedIndex > -1) {
+        // Remove from current position and add to end
+        newOrder.splice(clickedIndex, 1);
+        newOrder.push(suggestion);
+      }
+      return newOrder;
+    });
+    
+    // Create and send the message directly without using input area
+    const userMessage: Message = {
+      id: generateUniqueId(),
+      content: suggestion.trim(),
+      isUser: true,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setIsTyping(true);
+
+    // Process the message immediately
+    processMessage(userMessage);
   };
 
   // Check if user is interested in follow-up discussion
@@ -627,6 +756,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               : 'fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50'
             }
           `}
+          data-chat-window="true"
+          id="chat-window-container"
           style={{
             // Apple device safe area support
             paddingTop: isMobile ? 'env(safe-area-inset-top, 0px)' : '0px',
@@ -668,7 +799,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
 
           {/* Messages */}
-          <div className={`flex-1 overflow-y-auto bg-chat-bg ${isMobile ? 'p-3' : 'p-4'}`}>
+          <div 
+            className={`flex-1 overflow-y-auto bg-chat-bg ${isMobile ? 'p-3' : 'p-4'} ${isMobile ? 'scrollbar-hide' : 'chat-scrollbar'}`}
+            style={{
+              WebkitOverflowScrolling: isMobile ? 'touch' : 'auto',
+              overscrollBehavior: isMobile ? 'contain' : 'auto'
+            }}
+          >
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
@@ -706,7 +843,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 bg-blue-50 border-t border-blue-200"
+              className="px-3 py-1 bg-blue-50 border-t border-blue-200 group"
             >
               <div className="flex items-center space-x-2 text-sm text-blue-800 mb-2">
                 <Brain className="w-4 h-4" />
@@ -719,17 +856,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
                   <span>Saving and training AI model...</span>
                 </div>
               ) : (
-                <div className="flex space-x-2">
+                <div className={`flex space-x-2 transition-all duration-300 ${isMobile ? 'max-h-20' : 'max-h-0 overflow-hidden group-hover:max-h-20'}`}>
                   <button
                     onClick={() => handleLearningDecision(true)}
-                    className="flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600 transition-colors"
+                    className={`flex items-center space-x-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors ${isMobile ? 'px-4 py-2 text-sm min-h-[44px]' : 'px-3 py-1 text-xs'}`}
                   >
                     <Save className="w-3 h-3" />
                     <span>Yes, remember</span>
                   </button>
                   <button
                     onClick={() => handleLearningDecision(false)}
-                    className="flex items-center space-x-1 px-3 py-1 bg-gray-500 text-white rounded-full text-xs hover:bg-gray-600 transition-colors"
+                    className={`flex items-center space-x-1 bg-gray-500 text-white rounded-full hover:bg-gray-600 transition-colors ${isMobile ? 'px-4 py-2 text-sm min-h-[44px]' : 'px-3 py-1 text-xs'}`}
                   >
                     <XCircle className="w-3 h-3" />
                     <span>No, thanks</span>
@@ -738,6 +875,38 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               )}
             </motion.div>
           )}
+
+          {/* Sales Suggestion Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-3 py-2 bg-gradient-to-r from-green-50 to-blue-50 border-t border-green-200"
+            data-suggestions-section="true"
+          >
+            <div className="flex items-center space-x-2 text-sm text-green-800 mb-2">
+              <span className="font-medium">💼 Interested in working together?</span>
+            </div>
+            
+            <div 
+              className="flex gap-2 overflow-x-auto scrollbar-hide" 
+              style={{ 
+                scrollbarWidth: 'none', 
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: isMobile ? 'touch' : 'auto',
+                overscrollBehavior: isMobile ? 'contain' : 'auto'
+              }}
+            >
+              {badgeOrder.map((suggestion, index) => (
+                <button
+                  key={`${suggestion}-${index}`}
+                  onClick={() => handleSuggestionBadgeClick(suggestion)}
+                  className={`flex-shrink-0 bg-white text-green-700 border border-green-300 rounded-full font-medium hover:bg-green-100 hover:border-green-400 transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${isMobile ? 'px-4 py-2 text-sm min-h-[44px]' : 'px-3 py-1.5 text-xs'}`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </motion.div>
 
           {/* Input */}
           <div 
@@ -783,19 +952,23 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         isOpen={showLeadForm}
         onClose={() => {
           setShowLeadForm(false);
-          // Add cancellation message when form is closed without submission
-          setTimeout(() => {
-            const cancellationMessage: Message = {
-              id: generateUniqueId(),
-              content: "I see you did not finish your form, just let me know anytime you're interested in my service. Thank you! Is there anything else?",
-              isUser: false,
-              timestamp: new Date(),
-              source: 'faq',
-              confidence: 0.9,
-              relevance: 0.8,
-            };
-            setMessages(prev => [...prev, cancellationMessage]);
-          }, 1000);
+          // Only show cancellation message if form was NOT successfully submitted
+          if (!formSubmitted) {
+            setTimeout(() => {
+              const cancellationMessage: Message = {
+                id: generateUniqueId(),
+                content: "I see you did not finish your form, just let me know anytime you're interested in my service. Thank you! Is there anything else?",
+                isUser: false,
+                timestamp: new Date(),
+                source: 'faq',
+                confidence: 0.9,
+                relevance: 0.8,
+              };
+              setMessages(prev => [...prev, cancellationMessage]);
+            }, 1000);
+          }
+          // Reset form submitted state for next time
+          setFormSubmitted(false);
         }}
         onSubmit={handleLeadSubmission}
         triggerContext={leadTriggerContext}
